@@ -68,4 +68,10 @@ await showSection('schedule');
 showNotification("Erro ao bloquear horário.", "error");
 }
 }
+
+
+// --- generateCalendar atualizado ---
+function generateCalendar(myAppointments) {
+const calendar = document.getElementById('calendar'), startDate = new Date(currentWeek);
+startDate.setDate(startDate.getDate() - startDate.getDay());
 </html>
