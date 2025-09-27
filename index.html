@@ -193,7 +193,7 @@
                 formContainer.innerHTML = `<div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Cadastrar Imóvel</h3><button onclick="hideAddPropertyForm()" class="text-gray-500">✕</button></div>
                 <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label class="block text-sm">Título</label><input type="text" id="propertyTitle" class="w-full mt-1 p-2 border rounded-lg" required></div>
-                    <div><label class="block text-sm">Bairro</label><input type="text" id="propertyNeighborhood" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Bairro / Cidade</label><input type="text" id="propertyNeighborhood" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div class="md:col-span-2"><label class="block text-sm">Descrição</label><textarea id="propertyDescription" rows="3" class="w-full mt-1 p-2 border rounded-lg" required></textarea></div>
                     <div><label class="block text-sm">Valor (R$)</label><input type="number" id="propertyPrice" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div><label class="block text-sm">Tipo</label><select id="propertyType" class="w-full mt-1 p-2 border rounded-lg"><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="terreno">Terreno</option><option value="comercial">Comercial</option></select></div>
@@ -237,37 +237,45 @@
             async function handlePropertySave(e) {
                 e.preventDefault();
                 const saveButton = e.target.querySelector('button[type="submit"]');
+                const cancelButton = e.target.querySelector('button[type="button"]');
                 saveButton.disabled = true;
+                cancelButton.disabled = true;
                 saveButton.textContent = 'Salvando...';
                 
-                const photoFiles = document.getElementById('propertyPhotos').files;
-                let photoUrls = '';
-
-                if (photoFiles.length > 0) {
-                    const uploaded = await handleImageUploads(photoFiles);
-                    if (uploaded === null) { saveButton.disabled = false; saveButton.textContent = 'Salvar'; return; }
-                    photoUrls = uploaded;
-                }
-                
-                const data = { id: Date.now().toString(), title: document.getElementById('propertyTitle').value, description: document.getElementById('propertyDescription').value, price: document.getElementById('propertyPrice').value, neighborhood: document.getElementById('propertyNeighborhood').value, type: document.getElementById('propertyType').value, photos: photoUrls, corretor_email: brokerInfo.email };
-                showNotification('Salvando dados na planilha...', 'info');
                 try {
+                    const photoFiles = document.getElementById('propertyPhotos').files;
+                    let photoUrls = '';
+                    if (photoFiles.length > 0) {
+                        const uploaded = await handleImageUploads(photoFiles);
+                        if (uploaded === null) throw new Error("Falha no upload de imagem.");
+                        photoUrls = uploaded;
+                    }
+                    const data = { id: Date.now().toString(), title: document.getElementById('propertyTitle').value, description: document.getElementById('propertyDescription').value, price: document.getElementById('propertyPrice').value, neighborhood: document.getElementById('propertyNeighborhood').value, type: document.getElementById('propertyType').value, photos: photoUrls, corretor_email: brokerInfo.email };
+                    showNotification('Salvando dados na planilha...', 'info');
                     await fetch(`${apiUrl}?sheet=Imoveis`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [data] }) });
                     showNotification('Imóvel salvo com sucesso!', 'success');
                     hideAddPropertyForm();
                     await showSection('properties');
-                } catch (error) { showNotification('Erro ao salvar imóvel na planilha.', 'error'); }
-                saveButton.disabled = false;
-                saveButton.textContent = 'Salvar';
+                } catch (error) { 
+                    showNotification('Erro ao salvar imóvel.', 'error');
+                } finally {
+                    saveButton.disabled = false;
+                    cancelButton.disabled = false;
+                    saveButton.textContent = 'Salvar';
+                }
             }
 
             function renderSchedule() {
                 document.getElementById('schedule').innerHTML = `<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Minha Agenda</h2></div><div class="bg-white rounded-xl shadow-lg p-6"><div id="calendar" class="grid grid-cols-1 md:grid-cols-7 gap-4"></div></div><div class="bg-white rounded-xl shadow-lg p-6 mt-6"><h3 class="text-xl font-bold mb-4">Agendamentos Pendentes</h3><div id="pendingAppointments" class="space-y-4"></div></div>`;
-                generateCalendar();
-                loadPendingAppointments();
+                
+                const myPropertyIds = properties.filter(p => p.corretor_email && brokerInfo.email && p.corretor_email.toLowerCase() === brokerInfo.email.toLowerCase()).map(p => p.id);
+                const myAppointments = appointments.filter(a => myPropertyIds.includes(a.property_id));
+
+                generateCalendar(myAppointments);
+                loadPendingAppointments(myAppointments);
             }
 
-            function generateCalendar() {
+            function generateCalendar(myAppointments) {
                 const calendar = document.getElementById('calendar'), startDate = new Date(currentWeek);
                 startDate.setDate(startDate.getDate() - startDate.getDay());
                 calendar.innerHTML = '';
@@ -279,7 +287,7 @@
                     hours.forEach(hour => {
                         const slot = document.createElement('div'), [h, m] = hour.split(':');
                         const slotDateTime = new Date(currentDate); slotDateTime.setHours(parseInt(h), parseInt(m), 0, 0);
-                        const appointment = appointments.find(a => new Date(a.date).getTime() === slotDateTime.getTime());
+                        const appointment = myAppointments.find(a => new Date(a.date).getTime() === slotDateTime.getTime());
                         slot.className = `time-slot ${appointment ? (appointment.status === 'confirmed' ? 'occupied' : 'pending') : 'available'} text-white p-3 rounded-lg text-center text-sm`;
                         slot.innerHTML = appointment ? `${hour}<br><small>${appointment.clientName.split(' ')[0]}</small>` : hour;
                         dayColumn.appendChild(slot);
@@ -288,10 +296,9 @@
                 }
             }
             
-            function loadPendingAppointments() {
+            function loadPendingAppointments(myAppointments) {
                 const container = document.getElementById('pendingAppointments');
-                const myPropertyIds = properties.filter(p => p.corretor_email && brokerInfo.email && p.corretor_email.toLowerCase() === brokerInfo.email.toLowerCase()).map(p => p.id);
-                const pending = appointments.filter(a => a.status === 'pending' && myPropertyIds.includes(a.property_id));
+                const pending = myAppointments.filter(a => a.status === 'pending');
                 container.innerHTML = pending.length === 0 ? '<p class="text-gray-500 text-center py-4">Nenhum agendamento pendente</p>' : pending.map(a => `
                     <div class="bg-orange-50 border p-4 flex justify-between items-center">
                         <div><h4 class="font-semibold">${a.clientName}</h4><p class="text-sm">${a.property_title}</p><p class="text-sm">${new Date(a.date).toLocaleString('pt-BR')}</p></div>
@@ -299,8 +306,24 @@
                     </div>`).join('');
             }
 
-            window.confirmAppointment = async function(id) { /* ... */ }
-            window.rejectAppointment = async function(id) { /* ... */ }
+            window.confirmAppointment = async function(id) {
+                showNotification('Confirmando...', 'info');
+                try {
+                    await fetch(`${apiUrl}/id/${id}?sheet=Agendamentos`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: { status: 'confirmed' } }) });
+                    showNotification('Agendamento confirmado!', 'success');
+                    await showSection('schedule');
+                } catch(e) { showNotification('Erro ao confirmar.', 'error'); }
+            }
+
+            window.rejectAppointment = async function(id) {
+                if (!confirm('Recusar agendamento?')) return;
+                showNotification('Recusando...', 'info');
+                try {
+                    await fetch(`${apiUrl}/id/${id}?sheet=Agendamentos`, { method: 'DELETE' });
+                    showNotification('Agendamento recusado!', 'success');
+                    await showSection('schedule');
+                } catch(e) { showNotification('Erro ao recusar.', 'error'); }
+            }
             
             function renderClientAccess() {
                 const section = document.getElementById('client-access');
@@ -310,11 +333,11 @@
                 document.getElementById('clientLink').value = `${baseUrl}?client=true&broker=${brokerInfo.email}`;
             }
 
-            window.copyClientLink = function() { /* ... */ }
-            
+            // --- FUNÇÕES GLOBAIS E AUXILIARES ---
+            window.copyClientLink = function() { document.getElementById('clientLink').select(); document.execCommand('copy'); showNotification('Link copiado!', 'success'); }
             function showRegisterForm() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('registerScreen').classList.remove('hidden'); }
             function showLoginForm() { document.getElementById('registerScreen').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
-            function logout() { window.location.href = window.location.pathname; }
+            window.logout = function() { window.location.href = window.location.pathname; }
             function showNotification(message, type = 'info') {
                 const container = document.getElementById('notifications');
                 const notification = document.createElement('div');
