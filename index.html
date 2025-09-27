@@ -9,6 +9,8 @@
         body { box-sizing: border-box; }
         .notification { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .property-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .property-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .time-slot { transition: all 0.2s ease; }
         .available:hover { transform: scale(1.05); filter: brightness(1.1); }
         .available { background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; }
@@ -50,12 +52,41 @@
             <div class="mt-4 text-center"><button id="showLogin" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Já tem conta? Faça login</button></div>
         </div>
     </div>
-    
-    <div id="mainApp" class="hidden"></div>
+
+    <div id="mainApp" class="hidden">
+        <header class="bg-white shadow-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-4"><h1 class="text-2xl font-bold">🏠 Agenda do Corretor</h1><span id="notificationBadge" class="hidden bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></div>
+                    <nav class="hidden md:flex space-x-6">
+                        <button onclick="showSection('dashboard')" class="nav-btn">Dashboard</button>
+                        <button onclick="showSection('properties')" class="nav-btn">Imóveis</button>
+                        <button onclick="showSection('schedule')" class="nav-btn">Agenda</button>
+                        <button onclick="showSection('client-access')" class="nav-btn">Acesso Cliente</button>
+                    </nav>
+                    <div class="flex items-center space-x-4"><span class="text-sm text-gray-600">Olá, <span id="currentUser"></span></span><button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Sair</button></div>
+                </div>
+                <div class="md:hidden pb-4"><div class="flex space-x-2 overflow-x-auto">
+                    <button onclick="showSection('dashboard')" class="nav-btn-mobile">Dashboard</button>
+                    <button onclick="showSection('properties')" class="nav-btn-mobile">Imóveis</button>
+                    <button onclick="showSection('schedule')" class="nav-btn-mobile">Agenda</button>
+                    <button onclick="showSection('client-access')" class="nav-btn-mobile">Cliente</button>
+                </div></div>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="dashboard" class="section"></div>
+            <div id="properties" class="section hidden"></div>
+            <div id="schedule" class="section hidden"></div>
+            <div id="client-access" class="section hidden"></div>
+        </main>
+    </div>
+
     <div id="clientInterface" class="hidden"></div>
 
     <script>
         window.addEventListener('load', function() {
+            let currentUser=null, brokerInfo=null, properties=[], appointments=[], currentWeek=new Date(), clientCurrentWeek=new Date(), selectedProperty=null;
             const apiUrl = 'https://sheetdb.io/api/v1/bi8ruina76il1';
 
             function setupEventListeners() {
@@ -65,110 +96,31 @@
                 document.getElementById('showLogin').addEventListener('click', showLoginForm);
             }
 
+            async function loadData() {
+                try {
+                    const [propertiesRes, appointmentsRes] = await Promise.all([
+                        fetch(`${apiUrl}?sheet=Imoveis`),
+                        fetch(`${apiUrl}?sheet=Agendamentos`)
+                    ]);
+                    if (!propertiesRes.ok) throw new Error('Erro ao buscar imóveis');
+                    if (!appointmentsRes.ok) throw new Error('Erro ao buscar agendamentos');
+                    const propertiesData = await propertiesRes.json();
+                    const appointmentsData = await appointmentsRes.json();
+                    properties = propertiesData.map(p => ({...p, price: parseFloat(p.price) || 0, photos: p.photos ? p.photos.split(',').map(url => url.trim()) : [] }));
+                    appointments = appointmentsData.map(a => ({...a, date: new Date(a.date)})).filter(a => !isNaN(a.date.getTime()));
+                } catch (error) { showNotification("Não foi possível carregar dados da planilha.", "error"); }
+            }
+            
             async function handleLogin() {
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
+                const username = document.getElementById('username').value, password = document.getElementById('password').value;
                 if (!username || !password) { showNotification('Usuário e senha são obrigatórios.', 'warning'); return; }
                 
-                let loginSuccess = false;
-                let user;
-
+                let loginSuccess = false, user;
                 if (username === 'corretor' && password === '123456') {
                     loginSuccess = true;
-                    user = { name: 'Corretor Demo' };
+                    user = { name: 'Corretor Demo', phone: '(11) 99999-9999', email: 'demo@corretor.com' };
+                    currentUser = 'corretor';
                 } else {
                     showNotification('Verificando credenciais...', 'info');
                     try {
-                        const res = await fetch(`${apiUrl}/search?sheet=Usuarios&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
-                        if (!res.ok) throw new Error('Falha na verificação de login');
-                        const foundUsers = await res.json();
-                        if (foundUsers.length > 0) {
-                            loginSuccess = true;
-                            user = foundUsers[0];
-                        }
-                    } catch (e) {
-                        showNotification('Erro ao conectar com o servidor de usuários.', 'error');
-                        return;
-                    }
-                }
-
-                if (loginSuccess) {
-                    showNotification('Login bem-sucedido!', 'success');
-                    alert('Login funcionou! A próxima tela seria o dashboard do corretor.');
-                    // Aqui entraria a lógica futura para carregar os dados e mostrar o app principal
-                } else {
-                    showNotification('Usuário ou senha incorretos!', 'error');
-                }
-            }
-
-            async function handleRegister() {
-                const newUser = { 
-                    name: document.getElementById('regName').value,
-                    email: document.getElementById('regEmail').value,
-                    phone: document.getElementById('regPhone').value,
-                    city: document.getElementById('regCity').value,
-                    username: document.getElementById('regUsername').value,
-                    password: document.getElementById('regPassword').value
-                };
-
-                if(!newUser.name || !newUser.username || !newUser.password || !newUser.email) {
-                    showNotification('Preencha todos os campos obrigatórios.', 'warning');
-                    return;
-                }
-                
-                showNotification('Verificando se o usuário já existe...', 'info');
-                try {
-                    const checkRes = await fetch(`${apiUrl}/search?sheet=Usuarios&username=${encodeURIComponent(newUser.username)}`);
-                    if (!checkRes.ok) throw new Error('Falha ao verificar usuário');
-                    const existingUsers = await checkRes.json();
-                    if (existingUsers.length > 0) {
-                        showNotification('Este nome de usuário já está em uso!', 'error');
-                        return;
-                    }
-                    
-                    showNotification('Salvando novo corretor na planilha...', 'info');
-                    const postRes = await fetch(`${apiUrl}?sheet=Usuarios`, { 
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ data: [newUser] }) 
-                    });
-                    if (!postRes.ok) {
-                        throw new Error('Falha ao salvar o novo usuário');
-                    }
-                    
-                    showNotification('Cadastro realizado com sucesso! Use seus dados para fazer o login.', 'success');
-                    showLoginForm();
-                } catch(e) { 
-                    console.error('Registration Error:', e);
-                    showNotification('Erro no cadastro. Tente novamente.', 'error'); 
-                }
-            }
-
-            function showRegisterForm() {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('registerScreen').classList.remove('hidden');
-            }
-
-            function showLoginForm() {
-                document.getElementById('registerScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-            }
-            
-            function showNotification(message, type = 'info') {
-                const container = document.getElementById('notifications');
-                if (!container) return;
-                const notification = document.createElement('div');
-                const colors = { success: 'border-green-500', error: 'border-red-500', info: 'border-blue-500', warning: 'border-orange-500' };
-                const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-                notification.className = `notification bg-white border-l-4 ${colors[type]} p-4 rounded-lg shadow-lg max-w-sm flex items-center space-x-3`;
-                notification.innerHTML = `<div class="text-2xl">${icons[type]}</div><div class="flex-1 text-sm font-medium">${message}</div><button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600">✕</button>`;
-                container.appendChild(notification);
-                setTimeout(() => { if(notification.parentElement) notification.remove() }, 5000);
-            }
-
-            // Inicia a aplicação
-            setupEventListeners();
-        });
-    </script>
-</body>
-</html>
+                        const res = await fetch(`${apiUrl}/search?sheet=Usuarios&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}
