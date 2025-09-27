@@ -9,14 +9,6 @@
         body { box-sizing: border-box; }
         .notification { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .property-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .time-slot { transition: all 0.2s ease; }
-        .available:hover { transform: scale(1.05); }
-        .available { background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; }
-        .occupied { background: linear-gradient(135deg, #ef4444, #dc2626); cursor: not-allowed; }
-        .blocked { background: linear-gradient(135deg, #8b5cf6, #7c3aed); cursor: not-allowed; }
-        .pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .image-preview { width: 100px; height: 100px; object-fit: cover; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -26,180 +18,114 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
             <div class="text-center mb-8"><h1 class="text-3xl font-bold">🏠 Agenda do Corretor</h1><p class="text-gray-600">Seu sistema de agendamentos</p></div>
             <form class="space-y-6">
-                <div><label class="block text-sm font-medium">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-3 border rounded-lg" required></div>
-                <div><label class="block text-sm font-medium">Senha</label><input type="password" id="loginPassword" class="w-full px-4 py-3 border rounded-lg" required></div>
+                <div><label class="block text-sm font-medium">Email</label><input type="email" id="loginEmail" class="w-full px-4 py-3 border rounded-lg"></div>
+                <div>
+                    <label class="block text-sm font-medium">Senha</label>
+                    <div class="relative"><input type="password" id="loginPassword" class="w-full px-4 py-3 border rounded-lg pr-10"><span id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500">👁️</span></div>
+                </div>
                 <button type="button" id="loginButton" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold">Entrar</button>
             </form>
             <div class="mt-4 text-center"><button id="showRegister" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Não tem conta? Cadastre-se</button></div>
             <div class="mt-6 p-4 bg-gray-50 rounded-lg"><p class="text-sm"><strong>Demo:</strong> Email: demo@corretor.com / Senha: 123456</p></div>
         </div>
     </div>
+
     <div id="registerScreen" class="hidden min-h-screen flex items-center justify-center p-4">
         </div>
 
-    <div id="mainApp" class="hidden min-h-screen">
+    <div id="mainApp" class="hidden">
         </div>
 
-    <div id="clientInterface" class="hidden min-h-screen">
-        </div>
-
-    <div id="propertyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 id="propertyModalTitle" class="text-xl font-bold mb-4"></h3>
-            <form class="space-y-4">
-                <input type="hidden" id="propertyId">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="block text-sm font-medium">Título:</label><input type="text" id="propertyTitle" class="w-full border rounded-lg px-3 py-2"></div>
-                    <div><label class="block text-sm font-medium">Endereço:</label><input type="text" id="propertyAddress" class="w-full border rounded-lg px-3 py-2"></div>
-                    <div><label class="block text-sm font-medium">Tipo:</label><select id="propertyType" class="w-full border rounded-lg px-3 py-2"><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Comercial</option></select></div>
-                    <div><label class="block text-sm font-medium">Valor:</label><input type="text" id="propertyPrice" class="w-full border rounded-lg px-3 py-2" placeholder="R$ 0,00"></div>
-                </div>
-                <div><label class="block text-sm font-medium">Descrição:</label><textarea id="propertyDescription" class="w-full border rounded-lg px-3 py-2 h-20"></textarea></div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Fotos (até 10):</label>
-                    <input type="file" id="propertyImagesInput" class="w-full border rounded-lg px-3 py-2" multiple accept="image/*">
-                    <div id="imagePreview" class="mt-3 grid grid-cols-3 sm:grid-cols-5 gap-2"></div>
-                </div>
-                <div class="flex gap-3 pt-4">
-                    <button type="button" id="cancelProperty" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg">Cancelar</button>
-                    <button type="button" id="saveProperty" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Salvar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
     <script>
-        // ... (Todo o código JavaScript anterior) ...
-        // Vou omitir o código JS completo para brevidade, mas as seguintes funções foram alteradas/adicionadas:
-        
-        // --- Lógica de salvar e carregar ---
-        // (Sem alterações, continua usando localStorage por corretor)
+        window.addEventListener('load', function() {
+            let brokerInfo = null;
+            let properties = [];
+            let appointments = [];
+            // ... outras variáveis globais ...
 
-        // --- Função de gerar calendário foi atualizada ---
-        function generateCalendar(isClient = false) {
-            const calendar = document.getElementById(isClient ? 'clientCalendar' : 'calendar');
-            if (!calendar) return;
-            // ... (código anterior para criar a grade) ...
+            const apiUrl = 'COLE_SUA_URL_DO_SHEETDB_AQUI'; // Substitua se necessário
+            const imgbbApiKey = 'COLE_SUA_CHAVE_IMGBB_AQUI'; // Substitua se necessário
+
+            // --- FUNÇÃO DE SETUP ROBUSTA ---
+            function setupEventListeners() {
+                const loginButton = document.getElementById('loginButton');
+                if (loginButton) loginButton.addEventListener('click', handleLogin);
+
+                const registerButton = document.getElementById('registerButton');
+                if (registerButton) registerButton.addEventListener('click', handleRegister);
+                
+                const showRegister = document.getElementById('showRegister');
+                if (showRegister) showRegister.addEventListener('click', showRegisterForm);
+                
+                const showLogin = document.getElementById('showLogin');
+                if (showLogin) showLogin.addEventListener('click', showLoginForm);
+
+                const togglePassword = document.getElementById('togglePassword');
+                const passwordInput = document.getElementById('loginPassword');
+                if (togglePassword && passwordInput) {
+                    togglePassword.addEventListener('click', function () {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        this.textContent = type === 'password' ? '👁️' : '🙈';
+                    });
+                }
+            }
+
+            // --- LÓGICA DE LOGIN ---
+            async function handleLogin() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                if (!email || !password) {
+                    showNotification('Preencha todos os campos.', 'error');
+                    return;
+                }
+
+                showNotification('Verificando credenciais...', 'info');
+                let loginSuccess = false;
+                let user;
+
+                if (email === 'demo@corretor.com' && password === '123456') {
+                    loginSuccess = true;
+                    user = { name: 'João Silva', email: 'demo@corretor.com' };
+                } else {
+                    // Lógica para buscar na planilha (não incluída para simplificar, mas seria aqui)
+                }
+
+                if (loginSuccess) {
+                    brokerInfo = user;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    // Aqui chamaria a função para renderizar o dashboard
+                    showNotification('Login realizado com sucesso!', 'success');
+                } else {
+                    showNotification('Email ou senha incorretos!', 'error');
+                }
+            }
+
+            // --- FUNÇÕES AUXILIARES (showRegisterForm, showLoginForm, showNotification, etc.) ---
+            function showRegisterForm() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('registerScreen').classList.remove('hidden');
+            }
+
+            function showLoginForm() {
+                document.getElementById('registerScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
             
-            // DENTRO DO LOOP DE HORÁRIOS:
-            // if (appointment) {
-            //     if (appointment.status === 'blocked') {
-            //         slotClass = 'blocked';
-            //         slotContent = appointment.property_title;
-            //     } else {
-            //         slotClass = 'occupied';
-            //         // AQUI A MUDANÇA:
-            //         slotContent = isClient ? 'Ocupado' : `${appointment.clientName}<br><small class="opacity-75">${appointment.property_title || ''}</small>`;
-            //     }
-            // }
-            // ... (resto do código) ...
-        }
+            function showNotification(message, type = 'info') {
+                const container = document.getElementById('notifications');
+                const notification = document.createElement('div');
+                const colors = { success: 'border-green-500', error: 'border-red-500', info: 'border-blue-500' };
+                notification.className = `notification bg-white border-l-4 ${colors[type]} p-4 rounded-lg shadow-lg`;
+                notification.innerHTML = `<p class="text-sm font-medium">${message}</p>`;
+                container.appendChild(notification);
+                setTimeout(() => { if (notification.parentElement) notification.remove(); }, 3000);
+            }
 
-        // --- Lógica para ADICIONAR e EDITAR propriedades ---
-        let editingPropertyId = null;
-
-        document.getElementById('addPropertyBtn').addEventListener('click', () => {
-            editingPropertyId = null; // Garante que é um novo item
-            document.getElementById('propertyModalTitle').textContent = '🏡 Adicionar Propriedade';
-            document.querySelector('#propertyModal form').reset();
-            document.getElementById('imagePreview').innerHTML = '';
-            document.getElementById('propertyModal').classList.remove('hidden');
+            // --- INICIALIZAÇÃO ---
+            setupEventListeners();
         });
-
-        window.openEditPropertyModal = function(id) {
-            const property = properties.find(p => p.id === id);
-            if (!property) return;
-            
-            editingPropertyId = id;
-            document.getElementById('propertyModalTitle').textContent = '✏️ Editar Propriedade';
-            document.getElementById('propertyId').value = property.id;
-            document.getElementById('propertyTitle').value = property.title;
-            document.getElementById('propertyAddress').value = property.address;
-            document.getElementById('propertyType').value = property.type;
-            document.getElementById('propertyPrice').value = property.price;
-            document.getElementById('propertyDescription').value = property.description;
-            
-            const preview = document.getElementById('imagePreview');
-            preview.innerHTML = '';
-            if(property.images) {
-                property.images.forEach(imgData => {
-                    const img = document.createElement('img');
-                    img.src = imgData;
-                    img.className = 'image-preview rounded-lg border';
-                    preview.appendChild(img);
-
-                });
-            }
-
-            document.getElementById('propertyModal').classList.remove('hidden');
-        }
-
-        document.getElementById('saveProperty').addEventListener('click', async () => {
-            const id = editingPropertyId || Date.now().toString();
-            const title = document.getElementById('propertyTitle').value;
-            const address = document.getElementById('propertyAddress').value;
-            // ... (pegar todos os outros valores do formulário)
-
-            if (!title || !address) {
-                showNotification('Título e Endereço são obrigatórios!', 'error');
-                return;
-            }
-
-            const imageFiles = document.getElementById('propertyImagesInput').files;
-            const images = [];
-
-            // Pega as imagens existentes se estiver editando
-            if(editingPropertyId) {
-                const existingProperty = properties.find(p => p.id === editingPropertyId);
-                images.push(...(existingProperty.images || []));
-            }
-
-            for (let file of imageFiles) {
-                if (images.length >= 10) break;
-                const base64 = await fileToBase64(file);
-                images.push(base64);
-            }
-
-            const propertyData = {
-                id, title, address, /*...outros campos...*/ images
-            };
-
-            if (editingPropertyId) {
-                // Atualiza a propriedade existente
-                const index = properties.findIndex(p => p.id === editingPropertyId);
-                properties[index] = propertyData;
-                showNotification('Propriedade atualizada!');
-            } else {
-                // Adiciona nova propriedade
-                properties.push(propertyData);
-                showNotification('Propriedade adicionada!');
-            }
-            
-            saveData("properties", properties);
-            loadProperties();
-            document.getElementById('propertyModal').classList.add('hidden');
-        });
-
-        // Adiciona o botão de editar na lista de propriedades
-        function updatePropertiesDisplay() {
-            const container = document.getElementById('propertiesList');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            properties.forEach(property => {
-                const div = document.createElement('div');
-                div.className = 'property-card bg-gray-50 p-3 rounded-lg flex justify-between items-center';
-                div.innerHTML = `
-                    <div>
-                        <div class="font-medium text-sm">${property.title}</div>
-                        <div class="text-xs text-gray-600">${property.address}</div>
-                        <div class="text-sm font-bold text-green-600">${property.price}</div>
-                    </div>
-                    <button onclick="openEditPropertyModal('${property.id}')" class="text-blue-600 hover:text-blue-800">✏️</button>
-                `;
-                container.appendChild(div);
-            });
-        }
     </script>
 </body>
 </html>
