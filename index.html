@@ -31,22 +31,54 @@
     </div>
 
     <div id="registerScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8"><h1 class="text-3xl font-bold">📝 Cadastro de Corretor</h1><p class="text-gray-600">Crie sua conta</p></div>
+            <form class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-sm">Nome Completo</label><input type="text" id="regName" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Email</label><input type="email" id="regEmail" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">WhatsApp</label><input type="tel" id="regPhone" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Cidade</label><input type="text" id="regCity" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                </div>
+                <hr class="my-2">
+                <div><label class="block text-sm">Usuário (para login)</label><input type="text" id="regUsername" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                <div><label class="block text-sm">Senha</label><input type="password" id="regPassword" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                <button type="button" id="registerButton" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold">Cadastrar</button>
+            </form>
+            <div class="mt-4 text-center"><button id="showLogin" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Já tem conta? Faça login</button></div>
         </div>
+    </div>
 
     <div id="mainApp" class="hidden">
-        </div>
+        <header class="bg-white shadow-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-4"><h1 class="text-2xl font-bold">🏠 Agenda do Corretor</h1><span id="notificationBadge" class="hidden bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></div>
+                    <nav class="hidden md:flex space-x-6">
+                        <button onclick="showSection('dashboard')" class="nav-btn">Dashboard</button>
+                        <button onclick="showSection('properties')" class="nav-btn">Imóveis</button>
+                        <button onclick="showSection('schedule')" class="nav-btn">Agenda</button>
+                        <button onclick="showSection('client-access')" class="nav-btn">Acesso Cliente</button>
+                    </nav>
+                    <div class="flex items-center space-x-4"><span class="text-sm text-gray-600">Olá, <span id="currentUser"></span></span><button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Sair</button></div>
+                </div>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="dashboard" class="section"></div>
+            <div id="properties" class="section hidden"></div>
+            <div id="schedule" class="section hidden"></div>
+            <div id="client-access" class="section hidden"></div>
+        </main>
+    </div>
 
     <script>
         window.addEventListener('load', function() {
             let brokerInfo = null;
             let properties = [];
             let appointments = [];
-            // ... outras variáveis globais ...
+            const apiUrl = 'https://sheetdb.io/api/v1/bi8ruina76il1';
 
-            const apiUrl = 'COLE_SUA_URL_DO_SHEETDB_AQUI'; // Substitua se necessário
-            const imgbbApiKey = 'COLE_SUA_CHAVE_IMGBB_AQUI'; // Substitua se necessário
-
-            // --- FUNÇÃO DE SETUP ROBUSTA ---
             function setupEventListeners() {
                 const loginButton = document.getElementById('loginButton');
                 if (loginButton) loginButton.addEventListener('click', handleLogin);
@@ -71,7 +103,6 @@
                 }
             }
 
-            // --- LÓGICA DE LOGIN ---
             async function handleLogin() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
@@ -88,21 +119,79 @@
                     loginSuccess = true;
                     user = { name: 'João Silva', email: 'demo@corretor.com' };
                 } else {
-                    // Lógica para buscar na planilha (não incluída para simplificar, mas seria aqui)
+                    try {
+                        const res = await fetch(`${apiUrl}/search?sheet=Usuarios&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                        const foundUsers = await res.json();
+                        if(foundUsers.length > 0) {
+                            loginSuccess = true;
+                            user = foundUsers[0];
+                        }
+                    } catch(e) {
+                        showNotification('Erro ao conectar com o servidor.', 'error');
+                        return;
+                    }
                 }
 
                 if (loginSuccess) {
                     brokerInfo = user;
+                    document.getElementById('currentUser').textContent = brokerInfo.name;
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainApp').classList.remove('hidden');
-                    // Aqui chamaria a função para renderizar o dashboard
-                    showNotification('Login realizado com sucesso!', 'success');
+                    await showSection('dashboard');
                 } else {
                     showNotification('Email ou senha incorretos!', 'error');
                 }
             }
 
-            // --- FUNÇÕES AUXILIARES (showRegisterForm, showLoginForm, showNotification, etc.) ---
+             async function handleRegister() {
+                const newUser = { 
+                    name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
+                    phone: document.getElementById('regPhone').value, city: document.getElementById('regCity').value,
+                    password: document.getElementById('regPassword').value
+                };
+                if(!newUser.name || !newUser.email || !newUser.password) {
+                    showNotification('Nome, Email e Senha são obrigatórios.', 'warning');
+                    return;
+                }
+                
+                try {
+                    const checkRes = await fetch(`${apiUrl}/search?sheet=Usuarios&email=${encodeURIComponent(newUser.email)}`);
+                    const existingUsers = await checkRes.json();
+                    if (existingUsers.length > 0) {
+                        showNotification('Este email já está em uso!', 'error');
+                        return;
+                    }
+                    
+                    await fetch(`${apiUrl}?sheet=Usuarios`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ data: [newUser] }) 
+                    });
+                    
+                    showNotification('Cadastro realizado com sucesso! Faça o login.', 'success');
+                    showLoginForm();
+                } catch(e) { 
+                    showNotification('Erro no cadastro. Tente novamente.', 'error'); 
+                }
+            }
+            
+            window.showSection = async function(sectionName) {
+                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+                const section = document.getElementById(sectionName);
+                section.classList.remove('hidden');
+                section.innerHTML = `<div class="text-center py-16 text-gray-500">Sincronizando...</div>`;
+                
+                await loadData();
+                
+                // Lógica de renderização
+                if(sectionName === 'dashboard') {
+                    section.innerHTML = `PAINEL DASHBOARD`;
+                } else if (sectionName === 'properties') {
+                    section.innerHTML = `PAINEL IMÓVEIS`;
+                }
+                // Adicionar outras seções
+            }
+
             function showRegisterForm() {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('registerScreen').classList.remove('hidden');
@@ -113,17 +202,22 @@
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
             
+            window.logout = function() {
+                brokerInfo = null;
+                document.getElementById('mainApp').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+            
             function showNotification(message, type = 'info') {
                 const container = document.getElementById('notifications');
                 const notification = document.createElement('div');
-                const colors = { success: 'border-green-500', error: 'border-red-500', info: 'border-blue-500' };
+                const colors = { success: 'border-green-500', error: 'border-red-500', info: 'border-blue-500', warning: 'border-orange-500' };
                 notification.className = `notification bg-white border-l-4 ${colors[type]} p-4 rounded-lg shadow-lg`;
                 notification.innerHTML = `<p class="text-sm font-medium">${message}</p>`;
                 container.appendChild(notification);
                 setTimeout(() => { if (notification.parentElement) notification.remove(); }, 3000);
             }
 
-            // --- INICIALIZAÇÃO ---
             setupEventListeners();
         });
     </script>
