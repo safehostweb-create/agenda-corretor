@@ -9,6 +9,7 @@
         body { box-sizing: border-box; }
         .notification { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* Adicione outros estilos se necessário */
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -53,7 +54,7 @@
         <header class="bg-white shadow-lg border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center space-x-4"><h1 class="text-2xl font-bold">🏠 Agenda do Corretor</h1><span id="notificationBadge" class="hidden bg-red-500 text-white text-xs px-2 py-1 rounded-full">0</span></div>
+                    <div class="flex items-center space-x-4"><h1 class="text-2xl font-bold">🏠 Agenda do Corretor</h1></div>
                     <nav class="hidden md:flex space-x-6">
                         <button onclick="showSection('dashboard')" class="nav-btn">Dashboard</button>
                         <button onclick="showSection('properties')" class="nav-btn">Imóveis</button>
@@ -75,43 +76,28 @@
     <script>
         window.addEventListener('load', function() {
             let brokerInfo = null;
-            let properties = [];
-            let appointments = [];
             const apiUrl = 'https://sheetdb.io/api/v1/bi8ruina76il1';
 
+            // --- SETUP INICIAL ---
             function setupEventListeners() {
-                const loginButton = document.getElementById('loginButton');
-                if (loginButton) loginButton.addEventListener('click', handleLogin);
-
-                const registerButton = document.getElementById('registerButton');
-                if (registerButton) registerButton.addEventListener('click', handleRegister);
-                
-                const showRegister = document.getElementById('showRegister');
-                if (showRegister) showRegister.addEventListener('click', showRegisterForm);
-                
-                const showLogin = document.getElementById('showLogin');
-                if (showLogin) showLogin.addEventListener('click', showLoginForm);
-
-                const togglePassword = document.getElementById('togglePassword');
-                const passwordInput = document.getElementById('loginPassword');
-                if (togglePassword && passwordInput) {
-                    togglePassword.addEventListener('click', function () {
-                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                        passwordInput.setAttribute('type', type);
-                        this.textContent = type === 'password' ? '👁️' : '🙈';
-                    });
-                }
+                document.getElementById('loginButton').addEventListener('click', handleLogin);
+                document.getElementById('registerButton').addEventListener('click', handleRegister);
+                document.getElementById('showRegister').addEventListener('click', showRegisterForm);
+                document.getElementById('showLogin').addEventListener('click', showLoginForm);
+                document.getElementById('togglePassword').addEventListener('click', function() {
+                    const passInput = document.getElementById('loginPassword');
+                    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
             }
 
+            // --- LÓGICA DE AUTENTICAÇÃO ---
             async function handleLogin() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
-                if (!email || !password) {
-                    showNotification('Preencha todos os campos.', 'error');
-                    return;
-                }
+                if (!email || !password) { showNotification('Preencha todos os campos.', 'error'); return; }
 
-                showNotification('Verificando credenciais...', 'info');
                 let loginSuccess = false;
                 let user;
 
@@ -119,6 +105,7 @@
                     loginSuccess = true;
                     user = { name: 'João Silva', email: 'demo@corretor.com' };
                 } else {
+                    showNotification('Verificando credenciais...', 'info');
                     try {
                         const res = await fetch(`${apiUrl}/search?sheet=Usuarios&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
                         const foundUsers = await res.json();
@@ -126,10 +113,7 @@
                             loginSuccess = true;
                             user = foundUsers[0];
                         }
-                    } catch(e) {
-                        showNotification('Erro ao conectar com o servidor.', 'error');
-                        return;
-                    }
+                    } catch(e) { showNotification('Erro ao conectar.', 'error'); return; }
                 }
 
                 if (loginSuccess) {
@@ -143,8 +127,8 @@
                 }
             }
 
-             async function handleRegister() {
-                const newUser = { 
+            async function handleRegister() {
+                 const newUser = { 
                     name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
                     phone: document.getElementById('regPhone').value, city: document.getElementById('regCity').value,
                     password: document.getElementById('regPassword').value
@@ -175,23 +159,26 @@
                 }
             }
             
+            // --- NAVEGAÇÃO E RENDERIZAÇÃO ---
             window.showSection = async function(sectionName) {
                 document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
                 const section = document.getElementById(sectionName);
                 section.classList.remove('hidden');
                 section.innerHTML = `<div class="text-center py-16 text-gray-500">Sincronizando...</div>`;
                 
-                await loadData();
-                
-                // Lógica de renderização
+                // Simplesmente renderiza o conteúdo
                 if(sectionName === 'dashboard') {
-                    section.innerHTML = `PAINEL DASHBOARD`;
+                    section.innerHTML = `<h1>Dashboard do ${brokerInfo.name}</h1><p>Conteúdo do dashboard aqui...</p>`;
                 } else if (sectionName === 'properties') {
-                    section.innerHTML = `PAINEL IMÓVEIS`;
+                    section.innerHTML = `<h1>Meus Imóveis</h1><p>Lista de imóveis aqui...</p>`;
+                } else if (sectionName === 'schedule') {
+                    section.innerHTML = `<h1>Minha Agenda</h1><p>Calendário e agendamentos aqui...</p>`;
+                } else if (sectionName === 'client-access') {
+                    section.innerHTML = `<h1>Acesso Cliente</h1><p>Seu link de compartilhamento aqui...</p>`;
                 }
-                // Adicionar outras seções
             }
 
+            // --- FUNÇÕES AUXILIARES ---
             function showRegisterForm() {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('registerScreen').classList.remove('hidden');
@@ -218,6 +205,7 @@
                 setTimeout(() => { if (notification.parentElement) notification.remove(); }, 3000);
             }
 
+            // --- INICIALIZAÇÃO ---
             setupEventListeners();
         });
     </script>
