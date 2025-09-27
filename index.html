@@ -9,12 +9,6 @@
         body { box-sizing: border-box; }
         .notification { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .property-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .time-slot { transition: all 0.2s ease; }
-        .available:hover { transform: scale(1.05); }
-        .available { background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; }
-        .occupied { background: linear-gradient(135deg, #ef4444, #dc2626); cursor: not-allowed; }
-        .pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -40,7 +34,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
             <div class="text-center mb-8"><h1 class="text-3xl font-bold">📝 Cadastro de Corretor</h1><p class="text-gray-600">Crie sua conta</p></div>
             <form class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div><label class="block text-sm">Nome Completo</label><input type="text" id="regName" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div><label class="block text-sm">Email</label><input type="email" id="regEmail" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div><label class="block text-sm">WhatsApp</label><input type="tel" id="regPhone" class="w-full mt-1 p-2 border rounded-lg" required></div>
@@ -78,8 +72,6 @@
         </main>
     </div>
     
-    <div id="clientInterface" class="hidden"></div>
-
     <script>
         window.addEventListener('load', function() {
             let brokerInfo = null;
@@ -203,11 +195,11 @@
                         </div>
                     `;
                 } else if (sectionName === 'properties') {
-                     section.innerHTML = `<h1>Meus Imóveis</h1><p>Em breve...</p>`; // Rest of the content will be added
+                     section.innerHTML = `<h1>Meus Imóveis</h1><p>Em breve...</p>`; 
                 } else if (sectionName === 'schedule') {
-                     section.innerHTML = `<h1>Minha Agenda</h1><p>Em breve...</p>`; // Rest of the content will be added
+                     section.innerHTML = `<h1>Minha Agenda</h1><p>Em breve...</p>`;
                 } else if (sectionName === 'client-access') {
-                    section.innerHTML = `<h1>Acesso Cliente</h1><p>Em breve...</p>`; // Rest of the content will be added
+                    section.innerHTML = `<h1>Acesso Cliente</h1><p>Em breve...</p>`;
                 }
             }
 
