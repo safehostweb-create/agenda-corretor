@@ -82,10 +82,10 @@
 
     <script>
         window.addEventListener('load', function() {
-            let brokerInfo=null, properties=[], appointments=[];
+            let brokerInfo=null, properties=[], appointments=[], currentWeek=new Date(), clientCurrentWeek=new Date(), selectedProperty=null;
             const apiUrl = 'https://sheetdb.io/api/v1/bi8ruina76il1';
+            const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
-            // --- SETUP INICIAL ---
             function setupEventListeners() {
                 document.getElementById('loginButton').addEventListener('click', handleLogin);
                 document.getElementById('registerButton').addEventListener('click', handleRegister);
@@ -99,7 +99,6 @@
                 });
             }
 
-            // --- LÓGICA DE DADOS ---
             async function loadData() {
                 try {
                     const [propertiesRes, appointmentsRes] = await Promise.all([
@@ -110,8 +109,7 @@
                     appointments = (await appointmentsRes.json()).map(a => ({...a, date: new Date(a.date)})).filter(a => !isNaN(a.date.getTime()));
                 } catch (error) { showNotification("Não foi possível carregar dados da planilha.", "error"); }
             }
-
-            // --- AUTENTICAÇÃO E NAVEGAÇÃO ---
+            
             async function handleLogin() {
                 const username = document.getElementById('username').value, password = document.getElementById('password').value;
                 if (!username || !password) { showNotification('Preencha todos os campos.', 'warning'); return; }
@@ -167,7 +165,6 @@
                 else if (sectionName === 'client-access') renderClientAccess();
             }
 
-            // --- FUNÇÕES DE RENDERIZAÇÃO DAS SEÇÕES ---
             function renderDashboard() {
                 const section = document.getElementById('dashboard');
                 section.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="dashboard-cards"></div>`;
@@ -190,9 +187,108 @@
                     return `<div class="bg-white rounded-xl shadow-lg overflow-hidden"><img src="${photo}" class="w-full h-48 object-cover"><div class="p-6"><h3 class="text-xl font-bold">${p.title}</h3><p class="text-2xl font-bold text-green-600">R$ ${parseFloat(p.price).toLocaleString('pt-BR')}</p></div></div>`;
                 }).join('');
             }
+            
+            window.showAddPropertyForm = function() {
+                const formContainer = document.getElementById('propertyForm');
+                formContainer.innerHTML = `<div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Cadastrar Imóvel</h3><button onclick="hideAddPropertyForm()" class="text-gray-500">✕</button></div>
+                <form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-sm">Título</label><input type="text" id="propertyTitle" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Bairro</label><input type="text" id="propertyNeighborhood" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div class="md:col-span-2"><label class="block text-sm">Descrição</label><textarea id="propertyDescription" rows="3" class="w-full mt-1 p-2 border rounded-lg" required></textarea></div>
+                    <div><label class="block text-sm">Valor (R$)</label><input type="number" id="propertyPrice" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Tipo</label><select id="propertyType" class="w-full mt-1 p-2 border rounded-lg"><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="terreno">Terreno</option><option value="comercial">Comercial</option></select></div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm">Fotos (até 10)</label>
+                        <input type="file" id="propertyPhotos" multiple accept="image/*" class="w-full mt-1 p-2 border rounded-lg">
+                        <div id="image-upload-status" class="text-sm text-gray-500 mt-2"></div>
+                    </div>
+                    <div class="md:col-span-2 flex space-x-4"><button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">Salvar</button><button type="button" onclick="hideAddPropertyForm()" class="bg-gray-500 text-white px-6 py-3 rounded-lg">Cancelar</button></div>
+                </form>`;
+                formContainer.classList.remove('hidden');
+                document.getElementById('addPropertyForm').addEventListener('submit', handlePropertySave);
+            }
+
+            window.hideAddPropertyForm = function() { document.getElementById('propertyForm').classList.add('hidden'); }
+
+            async function handleImageUploads(files) {
+                const statusDiv = document.getElementById('image-upload-status');
+                const uploadedUrls = [];
+                const filesToUpload = Array.from(files).slice(0, 10);
+                for (let i = 0; i < filesToUpload.length; i++) {
+                    const file = filesToUpload[i];
+                    statusDiv.textContent = `Enviando imagem ${i + 1} de ${filesToUpload.length}...`;
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    try {
+                        const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+                        const result = await res.json();
+                        if (result.success) { uploadedUrls.push(result.data.url); } 
+                        else { throw new Error(result.error.message); }
+                    } catch (error) {
+                        showNotification(`Erro ao enviar imagem ${i + 1}: ${error.message}`, 'error');
+                        statusDiv.textContent = 'Ocorreu um erro no envio.';
+                        return null;
+                    }
+                }
+                statusDiv.textContent = 'Envio de imagens concluído!';
+                return uploadedUrls.join(',');
+            }
+
+            async function handlePropertySave(e) {
+                e.preventDefault();
+                const saveButton = e.target.querySelector('button[type="submit"]');
+                saveButton.disabled = true;
+                saveButton.textContent = 'Salvando...';
+                
+                const photoFiles = document.getElementById('propertyPhotos').files;
+                let photoUrls = '';
+
+                if (photoFiles.length > 0) {
+                    const uploaded = await handleImageUploads(photoFiles);
+                    if (uploaded === null) { saveButton.disabled = false; saveButton.textContent = 'Salvar'; return; }
+                    photoUrls = uploaded;
+                }
+                
+                const data = { id: Date.now().toString(), title: document.getElementById('propertyTitle').value, description: document.getElementById('propertyDescription').value, price: document.getElementById('propertyPrice').value, neighborhood: document.getElementById('propertyNeighborhood').value, type: document.getElementById('propertyType').value, photos: photoUrls, corretor_email: brokerInfo.email };
+                showNotification('Salvando dados na planilha...', 'info');
+                try {
+                    await fetch(`${apiUrl}?sheet=Imoveis`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [data] }) });
+                    showNotification('Imóvel salvo com sucesso!', 'success');
+                    hideAddPropertyForm();
+                    await showSection('properties');
+                } catch (error) { showNotification('Erro ao salvar imóvel na planilha.', 'error'); }
+                saveButton.disabled = false;
+                saveButton.textContent = 'Salvar';
+            }
 
             function renderSchedule() {
-                document.getElementById('schedule').innerHTML = `<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Minha Agenda</h2></div><div class="bg-white rounded-xl shadow-lg p-6 mt-6"><h3 class="text-xl font-bold mb-4">Agendamentos Pendentes</h3><div id="pendingAppointments" class="space-y-4"></div></div>`;
+                document.getElementById('schedule').innerHTML = `<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">Minha Agenda</h2></div><div class="bg-white rounded-xl shadow-lg p-6"><div id="calendar" class="grid grid-cols-1 md:grid-cols-7 gap-4"></div></div><div class="bg-white rounded-xl shadow-lg p-6 mt-6"><h3 class="text-xl font-bold mb-4">Agendamentos Pendentes</h3><div id="pendingAppointments" class="space-y-4"></div></div>`;
+                generateCalendar();
+                loadPendingAppointments();
+            }
+
+            function generateCalendar() {
+                const calendar = document.getElementById('calendar'), startDate = new Date(currentWeek);
+                startDate.setDate(startDate.getDate() - startDate.getDay());
+                calendar.innerHTML = '';
+                const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'], hours = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+                for (let day = 0; day < 7; day++) {
+                    const currentDate = new Date(startDate); currentDate.setDate(startDate.getDate() + day);
+                    const dayColumn = document.createElement('div'); dayColumn.className = 'space-y-2';
+                    dayColumn.innerHTML = `<div class="text-center font-semibold p-2 bg-gray-100 rounded-lg">${days[day]} ${currentDate.getDate()}/${currentDate.getMonth() + 1}</div>`;
+                    hours.forEach(hour => {
+                        const slot = document.createElement('div'), [h, m] = hour.split(':');
+                        const slotDateTime = new Date(currentDate); slotDateTime.setHours(parseInt(h), parseInt(m), 0, 0);
+                        const appointment = appointments.find(a => new Date(a.date).getTime() === slotDateTime.getTime());
+                        slot.className = `time-slot ${appointment ? (appointment.status === 'confirmed' ? 'occupied' : 'pending') : 'available'} text-white p-3 rounded-lg text-center text-sm`;
+                        slot.innerHTML = appointment ? `${hour}<br><small>${appointment.clientName.split(' ')[0]}</small>` : hour;
+                        dayColumn.appendChild(slot);
+                    });
+                    calendar.appendChild(dayColumn);
+                }
+            }
+            
+            function loadPendingAppointments() {
                 const container = document.getElementById('pendingAppointments');
                 const myPropertyIds = properties.filter(p => p.corretor_email && brokerInfo.email && p.corretor_email.toLowerCase() === brokerInfo.email.toLowerCase()).map(p => p.id);
                 const pending = appointments.filter(a => a.status === 'pending' && myPropertyIds.includes(a.property_id));
@@ -202,6 +298,9 @@
                         <div class="flex space-x-2"><button onclick="confirmAppointment('${a.id}')" class="bg-green-600 text-white px-3 py-1 text-sm rounded-lg">Confirmar</button><button onclick="rejectAppointment('${a.id}')" class="bg-red-600 text-white px-3 py-1 text-sm rounded-lg">Recusar</button></div>
                     </div>`).join('');
             }
+
+            window.confirmAppointment = async function(id) { /* ... */ }
+            window.rejectAppointment = async function(id) { /* ... */ }
             
             function renderClientAccess() {
                 const section = document.getElementById('client-access');
@@ -211,49 +310,11 @@
                 document.getElementById('clientLink').value = `${baseUrl}?client=true&broker=${brokerInfo.email}`;
             }
 
-            // --- FUNÇÕES GLOBAIS PARA ONCLICK ---
-            window.showAddPropertyForm = function() {
-                const formContainer = document.getElementById('propertyForm');
-                formContainer.innerHTML = `<div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Cadastrar Imóvel</h3><button onclick="hideAddPropertyForm()" class="text-gray-500">✕</button></div><form id="addPropertyForm" class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm">Título</label><input type="text" id="propertyTitle" class="w-full mt-1 p-2 border rounded-lg" required></div><div><label class="block text-sm">Bairro</label><input type="text" id="propertyNeighborhood" class="w-full mt-1 p-2 border rounded-lg" required></div><div class="md:col-span-2"><label class="block text-sm">Descrição</label><textarea id="propertyDescription" rows="3" class="w-full mt-1 p-2 border rounded-lg" required></textarea></div><div><label class="block text-sm">Valor (R$)</label><input type="number" id="propertyPrice" class="w-full mt-1 p-2 border rounded-lg" required></div><div><label class="block text-sm">Tipo</label><select id="propertyType" class="w-full mt-1 p-2 border rounded-lg"><option value="apartamento">Apartamento</option><option value="casa">Casa</option><option value="terreno">Terreno</option><option value="comercial">Comercial</option></select></div><div class="md:col-span-2"><label class="block text-sm">URLs das Fotos (separadas por vírgula)</label><input type="text" id="propertyPhotos" class="w-full mt-1 p-2 border rounded-lg"></div><div class="md:col-span-2 flex space-x-4"><button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold">Salvar</button><button type="button" onclick="hideAddPropertyForm()" class="bg-gray-500 text-white px-6 py-3 rounded-lg">Cancelar</button></div></form>`;
-                formContainer.classList.remove('hidden');
-                document.getElementById('addPropertyForm').addEventListener('submit', savePropertyToSheet);
-            }
-            window.hideAddPropertyForm = function() { document.getElementById('propertyForm').classList.add('hidden'); }
-            window.confirmAppointment = async function(id) {
-                showNotification('Confirmando...', 'info');
-                try {
-                    await fetch(`${apiUrl}/id/${id}?sheet=Agendamentos`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: { status: 'confirmed' } }) });
-                    showNotification('Agendamento confirmado!', 'success');
-                    await showSection('schedule');
-                } catch(e) { showNotification('Erro ao confirmar.', 'error'); }
-            }
-            window.rejectAppointment = async function(id) {
-                if (!confirm('Recusar agendamento?')) return;
-                showNotification('Recusando...', 'info');
-                try {
-                    await fetch(`${apiUrl}/id/${id}?sheet=Agendamentos`, { method: 'DELETE' });
-                    showNotification('Agendamento recusado!', 'success');
-                    await showSection('schedule');
-                } catch(e) { showNotification('Erro ao recusar.', 'error'); }
-            }
-            window.copyClientLink = function() { document.getElementById('clientLink').select(); document.execCommand('copy'); showNotification('Link copiado!', 'success'); }
-            window.logout = function() { window.location.href = window.location.pathname; }
-
-            async function savePropertyToSheet(e) {
-                if (e) e.preventDefault();
-                const data = { id: Date.now().toString(), title: document.getElementById('propertyTitle').value, description: document.getElementById('propertyDescription').value, price: document.getElementById('propertyPrice').value, neighborhood: document.getElementById('propertyNeighborhood').value, type: document.getElementById('propertyType').value, photos: document.getElementById('propertyPhotos').value, corretor_email: brokerInfo.email };
-                showNotification('Salvando imóvel...', 'info');
-                try {
-                    await fetch(`${apiUrl}?sheet=Imoveis`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [data] }) });
-                    showNotification('Imóvel salvo!', 'success');
-                    hideAddPropertyForm();
-                    await showSection('properties');
-                } catch (error) { showNotification('Erro ao salvar.', 'error'); }
-            }
-
-            // --- FUNÇÕES AUXILIARES ---
+            window.copyClientLink = function() { /* ... */ }
+            
             function showRegisterForm() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('registerScreen').classList.remove('hidden'); }
             function showLoginForm() { document.getElementById('registerScreen').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
+            function logout() { window.location.href = window.location.pathname; }
             function showNotification(message, type = 'info') {
                 const container = document.getElementById('notifications');
                 const notification = document.createElement('div');
