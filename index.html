@@ -14,351 +14,216 @@
         .available:hover { transform: scale(1.05); }
         .available { background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; }
         .occupied { background: linear-gradient(135deg, #ef4444, #dc2626); cursor: not-allowed; }
-        .blocked { background: linear-gradient(135deg, #f59e0b, #d97706); cursor: pointer; }
-        .pending { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-        .calendar-day { min-height: 120px; }
-        .calendar-day:hover { background-color: #f8fafc; }
+        .blocked { background: linear-gradient(135deg, #8b5cf6, #7c3aed); cursor: not-allowed; }
+        .pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <!-- Login Screen -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">🏠 Agenda do Corretor</h1>
-                <p class="text-gray-600 mt-2">Seu sistema de agendamentos</p>
-            </div>
+            <div class="text-center mb-8"><h1 class="text-3xl font-bold">🏠 Agenda do Corretor</h1><p class="text-gray-600">Seu sistema de agendamentos</p></div>
             <form class="space-y-6">
+                <div><label class="block text-sm font-medium">Usuário</label><input type="text" id="username" class="w-full px-4 py-3 border rounded-lg"></div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Usuário</label>
-                    <input type="text" id="username" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium">Senha</label>
+                    <div class="relative"><input type="password" id="password" class="w-full px-4 py-3 border rounded-lg pr-10"><span id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500">👁️</span></div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Senha</label>
-                    <div class="relative">
-                        <input type="password" id="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <span id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500 hover:text-gray-700">👁️</span>
-                    </div>
-                </div>
-                <button type="button" id="loginButton" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all">Entrar</button>
+                <button type="button" id="loginButton" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg font-semibold">Entrar</button>
             </form>
-            <div class="mt-4 text-center">
-                <button id="showRegister" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Não tem conta? Cadastre-se aqui</button>
-            </div>
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                <p class="text-sm text-gray-600"><strong>Demo:</strong> Usuário: corretor / Senha: 123456</p>
-            </div>
+            <div class="mt-4 text-center"><button id="showRegister" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Não tem conta? Cadastre-se aqui</button></div>
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg"><p class="text-sm"><strong>Demo:</strong> Usuário: corretor / Senha: 123456</p></div>
         </div>
     </div>
 
-    <!-- Register Screen -->
     <div id="registerScreen" class="hidden min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">📝 Cadastro de Corretor</h1>
-                <p class="text-gray-600 mt-2">Crie sua conta</p>
-            </div>
+            <div class="text-center mb-8"><h1 class="text-3xl font-bold">📝 Cadastro de Corretor</h1><p class="text-gray-600">Crie sua conta</p></div>
             <form class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                        <input type="text" id="regName" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" id="regEmail" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">WhatsApp</label>
-                        <input type="tel" id="regPhone" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="(11) 99999-9999" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Cidade</label>
-                        <input type="text" id="regCity" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                    </div>
+                    <div><label class="block text-sm">Nome Completo</label><input type="text" id="regName" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Email</label><input type="email" id="regEmail" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">WhatsApp</label><input type="tel" id="regPhone" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Cidade</label><input type="text" id="regCity" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Usuário</label><input type="text" id="regUsername" class="w-full mt-1 p-2 border rounded-lg" required></div>
+                    <div><label class="block text-sm">Senha</label><input type="password" id="regPassword" class="w-full mt-1 p-2 border rounded-lg" required></div>
                 </div>
-                <hr class="my-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Usuário (para login)</label>
-                    <input type="text" id="regUsername" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Senha</label>
-                    <input type="password" id="regPassword" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
-                    <input type="password" id="regConfirmPassword" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <button type="button" id="registerButton" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all">Criar Conta</button>
+                <button type="button" id="registerButton" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold">Cadastrar</button>
             </form>
-            <div class="mt-4 text-center">
-                <button id="showLogin" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Já tem conta? Faça login</button>
-            </div>
+            <div class="mt-4 text-center"><button id="showLogin" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Já tem conta? Faça login</button></div>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="mainApp" class="hidden">
+    <div id="dashboardScreen" class="hidden min-h-screen">
         <nav class="bg-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center space-x-4">
-                        <h1 class="text-2xl font-bold text-gray-800">🏠 Agenda do Corretor</h1>
-                        <span id="welcomeUser" class="text-gray-600"></span>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-bold text-gray-900">🏠 Painel do Corretor</h1>
+                        <span id="welcomeUser" class="ml-4 text-gray-600"></span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button id="dashboardBtn" class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">Dashboard</button>
-                        <button id="calendarBtn" class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Agenda</button>
-                        <button id="addPropertyBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">+ Adicionar Imóvel</button>
+                        <button id="blockTimeBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">⏰ Bloquear Horário</button>
+                        <button id="shareUrlBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">🔗 Meu Link</button>
                         <button id="logoutBtn" class="text-gray-600 hover:text-gray-800">Sair</button>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Dashboard View -->
-        <div id="dashboardView" class="max-w-7xl mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h2 class="text-xl font-semibold mb-6">Meus Imóveis</h2>
-                        <div id="propertiesList" class="space-y-4">
-                            <!-- Properties will be loaded here -->
+                        <h2 class="text-2xl font-bold mb-6">📅 Agenda de Visitas</h2>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Selecionar Data:</label>
+                            <input type="date" id="dateSelector" class="border rounded-lg px-3 py-2">
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" id="timeSlots"></div>
+                        
+                        <div class="mt-6 flex flex-wrap gap-4 text-sm">
+                            <div class="flex items-center"><div class="w-4 h-4 rounded available mr-2"></div>Disponível</div>
+                            <div class="flex items-center"><div class="w-4 h-4 rounded occupied mr-2"></div>Ocupado</div>
+                            <div class="flex items-center"><div class="w-4 h-4 rounded blocked mr-2"></div>Bloqueado</div>
+                            <div class="flex items-center"><div class="w-4 h-4 rounded pending mr-2"></div>Pendente</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-6">
                     <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Agenda de Hoje</h3>
-                        <div id="todaySchedule" class="space-y-3">
-                            <!-- Today's schedule will be loaded here -->
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Estatísticas</h3>
+                        <h3 class="text-xl font-bold mb-4">📊 Resumo do Dia</h3>
                         <div class="space-y-3">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Imóveis cadastrados:</span>
-                                <span id="totalProperties" class="font-semibold">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Visitas hoje:</span>
-                                <span id="todayVisits" class="font-semibold">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Visitas esta semana:</span>
-                                <span id="weekVisits" class="font-semibold">0</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Horários bloqueados:</span>
-                                <span id="blockedSlots" class="font-semibold">0</span>
-                            </div>
+                            <div class="flex justify-between"><span>Visitas Agendadas:</span><span id="scheduledCount" class="font-bold text-blue-600">0</span></div>
+                            <div class="flex justify-between"><span>Horários Livres:</span><span id="availableCount" class="font-bold text-green-600">0</span></div>
+                            <div class="flex justify-between"><span>Bloqueados:</span><span id="blockedCount" class="font-bold text-purple-600">0</span></div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4">Próximas Visitas</h3>
-                        <div id="upcomingVisits" class="space-y-3">
-                            <!-- Upcoming visits will be loaded here -->
-                        </div>
+                        <h3 class="text-xl font-bold mb-4">🏡 Propriedades</h3>
+                        <div id="propertiesList" class="space-y-3"></div>
+                        <button id="addPropertyBtn" class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors">+ Adicionar Propriedade</button>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calendar View -->
-        <div id="calendarView" class="hidden max-w-7xl mx-auto px-4 py-8">
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold">Minha Agenda</h2>
-                    <div class="flex items-center space-x-4">
-                        <button id="prevMonth" class="p-2 hover:bg-gray-100 rounded-lg">←</button>
-                        <span id="currentMonth" class="text-lg font-medium"></span>
-                        <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-lg">→</button>
-                    </div>
-                </div>
-                
-                <div class="mb-4 flex flex-wrap gap-4 text-sm">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-4 h-4 bg-gradient-to-r from-green-500 to-green-600 rounded"></div>
-                        <span>Disponível</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-4 h-4 bg-gradient-to-r from-red-500 to-red-600 rounded"></div>
-                        <span>Ocupado</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-4 h-4 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded"></div>
-                        <span>Bloqueado</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-4 h-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded"></div>
-                        <span>Pendente</span>
-                    </div>
-                </div>
-
-                <div id="calendar" class="grid grid-cols-7 gap-1">
-                    <!-- Calendar will be generated here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Property Modal -->
-    <div id="addPropertyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Adicionar Novo Imóvel</h2>
-                <button id="closeAddModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <form id="addPropertyForm" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Modal para Bloquear Horário -->
+    <div id="blockTimeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">⏰ Bloquear Horário</h3>
+            <form class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Data:</label>
+                    <input type="date" id="blockDate" class="w-full border rounded-lg px-3 py-2" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo do Imóvel</label>
-                        <select id="propertyType" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Selecione o tipo</option>
-                            <option value="casa">Casa</option>
-                            <option value="apartamento">Apartamento</option>
-                            <option value="terreno">Terreno</option>
-                            <option value="comercial">Comercial</option>
-                        </select>
+                        <label class="block text-sm font-medium mb-1">Hora Início:</label>
+                        <input type="time" id="blockStartTime" class="w-full border rounded-lg px-3 py-2" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
-                        <input type="number" id="propertyPrice" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        <label class="block text-sm font-medium mb-1">Hora Fim:</label>
+                        <input type="time" id="blockEndTime" class="w-full border rounded-lg px-3 py-2" required>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Endereço Completo</label>
-                    <input type="text" id="propertyAddress" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                    <label class="block text-sm font-medium mb-1">Motivo:</label>
+                    <input type="text" id="blockReason" class="w-full border rounded-lg px-3 py-2" placeholder="Ex: Consulta médica, Reunião..." required>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Quartos</label>
-                        <input type="number" id="propertyRooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" min="0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Banheiros</label>
-                        <input type="number" id="propertyBathrooms" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" min="0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Área (m²)</label>
-                        <input type="number" id="propertyArea" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" min="0">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-                    <textarea id="propertyDescription" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                </div>
-                <div class="flex justify-end space-x-4 pt-4">
-                    <button type="button" id="cancelAddProperty" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Adicionar Imóvel</button>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" id="cancelBlock" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Cancelar</button>
+                    <button type="button" id="confirmBlock" class="flex-1 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">Bloquear</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Schedule Modal -->
-    <div id="scheduleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Agendar Visita</h2>
-                <button id="closeScheduleModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="scheduleContent">
-                <!-- Schedule content will be loaded here -->
+    <!-- Modal para Compartilhar URL -->
+    <div id="shareUrlModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">🔗 Seu Link de Agendamento</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Link Personalizado:</label>
+                    <div class="flex">
+                        <input type="text" id="personalUrl" class="flex-1 border rounded-l-lg px-3 py-2 bg-gray-50" readonly>
+                        <button id="copyUrlBtn" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition-colors">📋</button>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <p>Compartilhe este link com seus clientes para que eles possam agendar visitas diretamente na sua agenda!</p>
+                </div>
+                <button id="closeUrlModal" class="w-full bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- Block Time Modal -->
-    <div id="blockTimeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Bloquear Horário</h2>
-                <button id="closeBlockModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <form id="blockTimeForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Data e Horário</label>
-                    <input type="text" id="blockDateTime" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Motivo do Bloqueio</label>
-                    <select id="blockReason" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                        <option value="">Selecione o motivo</option>
-                        <option value="Consulta Médica">Consulta Médica</option>
-                        <option value="Almoço">Almoço</option>
-                        <option value="Reunião">Reunião</option>
-                        <option value="Compromisso Pessoal">Compromisso Pessoal</option>
-                        <option value="Viagem">Viagem</option>
-                        <option value="Outro">Outro</option>
-                    </select>
-                </div>
-                <div id="customReasonDiv" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Especifique o motivo</label>
-                    <input type="text" id="customReason" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
-                    <textarea id="blockNotes" rows="2" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Informações adicionais..."></textarea>
-                </div>
-                <div class="flex justify-end space-x-4 pt-4">
-                    <button type="button" id="cancelBlockTime" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancelar</button>
-                    <button type="submit" class="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">Bloquear Horário</button>
+    <!-- Modal para Adicionar Propriedade -->
+    <div id="propertyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">🏡 Adicionar Propriedade</h3>
+            <form class="space-y-4">
+                <div><label class="block text-sm font-medium mb-1">Endereço:</label><input type="text" id="propertyAddress" class="w-full border rounded-lg px-3 py-2" required></div>
+                <div><label class="block text-sm font-medium mb-1">Tipo:</label><select id="propertyType" class="w-full border rounded-lg px-3 py-2"><option>Casa</option><option>Apartamento</option><option>Terreno</option><option>Comercial</option></select></div>
+                <div><label class="block text-sm font-medium mb-1">Valor:</label><input type="text" id="propertyPrice" class="w-full border rounded-lg px-3 py-2" placeholder="R$ 0,00"></div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" id="cancelProperty" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg">Cancelar</button>
+                    <button type="button" id="saveProperty" class="flex-1 bg-green-600 text-white py-2 rounded-lg">Salvar</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Day Schedule Modal -->
-    <div id="dayScheduleModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="dayScheduleTitle" class="text-2xl font-bold"></h2>
-                <button id="closeDayScheduleModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="dayScheduleContent">
-                <!-- Day schedule content will be loaded here -->
-            </div>
         </div>
     </div>
 
     <script>
-        // Data storage
-        let users = JSON.parse(localStorage.getItem('agendaUsers') || '{}');
-        let properties = JSON.parse(localStorage.getItem('agendaProperties') || '{}');
-        let appointments = JSON.parse(localStorage.getItem('agendaAppointments') || '{}');
-        let blockedTimes = JSON.parse(localStorage.getItem('agendaBlockedTimes') || '{}');
-        let currentUser = null;
-        let currentDate = new Date();
-        let currentView = 'dashboard';
+        // Sistema de dados local
+        const storage = {
+            users: JSON.parse(localStorage.getItem('realtorUsers') || '{}'),
+            appointments: JSON.parse(localStorage.getItem('appointments') || '{}'),
+            properties: JSON.parse(localStorage.getItem('properties') || '{}'),
+            blockedTimes: JSON.parse(localStorage.getItem('blockedTimes') || '{}'),
+            
+            save() {
+                localStorage.setItem('realtorUsers', JSON.stringify(this.users));
+                localStorage.setItem('appointments', JSON.stringify(this.appointments));
+                localStorage.setItem('properties', JSON.stringify(this.properties));
+                localStorage.setItem('blockedTimes', JSON.stringify(this.blockedTimes));
+            }
+        };
 
-        // Initialize demo data
-        if (!users['corretor']) {
-            users['corretor'] = {
+        let currentUser = null;
+
+        // Inicializar usuário demo
+        if (!storage.users['corretor']) {
+            storage.users['corretor'] = {
+                name: 'Corretor Demo',
+                email: 'demo@corretor.com',
+                phone: '(11) 99999-9999',
+                city: 'São Paulo',
                 username: 'corretor',
                 password: '123456',
-                name: 'João Silva',
-                email: 'joao@corretor.com',
-                phone: '(11) 99999-9999',
-                city: 'São Paulo'
+                urlCode: 'demo123'
             };
-            saveData();
+            storage.save();
         }
 
-        function saveData() {
-            localStorage.setItem('agendaUsers', JSON.stringify(users));
-            localStorage.setItem('agendaProperties', JSON.stringify(properties));
-            localStorage.setItem('agendaAppointments', JSON.stringify(appointments));
-            localStorage.setItem('agendaBlockedTimes', JSON.stringify(blockedTimes));
+        // Função para gerar código único para URL
+        function generateUrlCode(username) {
+            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = username.substring(0, 3).toLowerCase();
+            for (let i = 0; i < 3; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
+        // Função para mostrar notificações
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');
             notification.className = `notification p-4 rounded-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
@@ -367,68 +232,43 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-        // Navigation
-        function switchView(view) {
-            document.getElementById('dashboardView').classList.toggle('hidden', view !== 'dashboard');
-            document.getElementById('calendarView').classList.toggle('hidden', view !== 'calendar');
-            
-            document.getElementById('dashboardBtn').classList.toggle('text-blue-600', view === 'dashboard');
-            document.getElementById('dashboardBtn').classList.toggle('text-gray-600', view !== 'dashboard');
-            document.getElementById('calendarBtn').classList.toggle('text-blue-600', view === 'calendar');
-            document.getElementById('calendarBtn').classList.toggle('text-gray-600', view !== 'calendar');
-            
-            currentView = view;
-            
-            if (view === 'calendar') {
-                generateCalendar();
-            } else {
-                loadDashboard();
-            }
-        }
-
-        document.getElementById('dashboardBtn').addEventListener('click', () => switchView('dashboard'));
-        document.getElementById('calendarBtn').addEventListener('click', () => switchView('calendar'));
-
-        // Login functionality
+        // Alternar visibilidade da senha
         document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+            const passwordField = document.getElementById('password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
             this.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        document.getElementById('loginButton').addEventListener('click', function() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                showNotification('Por favor, preencha todos os campos', 'error');
-                return;
-            }
-
-            if (users[username] && users[username].password === password) {
-                currentUser = username;
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('welcomeUser').textContent = `Olá, ${users[username].name}`;
-                switchView('dashboard');
-                showNotification('Login realizado com sucesso!');
-            } else {
-                showNotification('Usuário ou senha incorretos', 'error');
-            }
-        });
-
-        // Registration functionality
-        document.getElementById('showRegister').addEventListener('click', function() {
+        // Navegação entre telas
+        document.getElementById('showRegister').addEventListener('click', () => {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('registerScreen').classList.remove('hidden');
         });
 
-        document.getElementById('showLogin').addEventListener('click', function() {
+        document.getElementById('showLogin').addEventListener('click', () => {
             document.getElementById('registerScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
         });
 
+        // Login
+        document.getElementById('loginButton').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (storage.users[username] && storage.users[username].password === password) {
+                currentUser = username;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                document.getElementById('welcomeUser').textContent = `Olá, ${storage.users[username].name}`;
+                initializeDashboard();
+                showNotification('Login realizado com sucesso!');
+            } else {
+                showNotification('Usuário ou senha incorretos!', 'error');
+            }
+        });
+
+        // Cadastro
         document.getElementById('registerButton').addEventListener('click', function() {
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
@@ -436,615 +276,261 @@
             const city = document.getElementById('regCity').value;
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-            if (!name || !email || !phone || !city || !username || !password || !confirmPassword) {
-                showNotification('Por favor, preencha todos os campos', 'error');
+            if (!name || !email || !phone || !city || !username || !password) {
+                showNotification('Preencha todos os campos!', 'error');
                 return;
             }
 
-            if (password !== confirmPassword) {
-                showNotification('As senhas não coincidem', 'error');
+            if (storage.users[username]) {
+                showNotification('Usuário já existe!', 'error');
                 return;
             }
 
-            if (users[username]) {
-                showNotification('Este usuário já existe', 'error');
-                return;
-            }
+            const urlCode = generateUrlCode(username);
+            storage.users[username] = { name, email, phone, city, username, password, urlCode };
+            storage.save();
 
-            users[username] = { name, email, phone, city, username, password };
-            saveData();
-            showNotification('Conta criada com sucesso!');
+            showNotification('Cadastro realizado com sucesso!');
             document.getElementById('registerScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
         });
 
-        // Logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', function() {
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
             currentUser = null;
-            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
             showNotification('Logout realizado com sucesso!');
         });
 
-        // Add property functionality
-        document.getElementById('addPropertyBtn').addEventListener('click', function() {
-            document.getElementById('addPropertyModal').classList.remove('hidden');
-        });
-
-        document.getElementById('closeAddModal').addEventListener('click', function() {
-            document.getElementById('addPropertyModal').classList.add('hidden');
-        });
-
-        document.getElementById('cancelAddProperty').addEventListener('click', function() {
-            document.getElementById('addPropertyModal').classList.add('hidden');
-        });
-
-        document.getElementById('addPropertyForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const propertyData = {
-                id: Date.now().toString(),
-                owner: currentUser,
-                type: document.getElementById('propertyType').value,
-                price: document.getElementById('propertyPrice').value,
-                address: document.getElementById('propertyAddress').value,
-                rooms: document.getElementById('propertyRooms').value,
-                bathrooms: document.getElementById('propertyBathrooms').value,
-                area: document.getElementById('propertyArea').value,
-                description: document.getElementById('propertyDescription').value,
-                createdAt: new Date().toISOString()
-            };
-
-            if (!properties[currentUser]) {
-                properties[currentUser] = [];
-            }
-            properties[currentUser].push(propertyData);
-            saveData();
-            
-            document.getElementById('addPropertyModal').classList.add('hidden');
-            document.getElementById('addPropertyForm').reset();
-            if (currentView === 'dashboard') {
-                loadProperties();
-            }
-            showNotification('Imóvel adicionado com sucesso!');
-        });
-
-        // Schedule modal functionality
-        document.getElementById('closeScheduleModal').addEventListener('click', function() {
-            document.getElementById('scheduleModal').classList.add('hidden');
-        });
-
-        // Block time modal functionality
-        document.getElementById('closeBlockModal').addEventListener('click', function() {
-            document.getElementById('blockTimeModal').classList.add('hidden');
-        });
-
-        document.getElementById('cancelBlockTime').addEventListener('click', function() {
-            document.getElementById('blockTimeModal').classList.add('hidden');
-        });
-
-        document.getElementById('blockReason').addEventListener('change', function() {
-            const customDiv = document.getElementById('customReasonDiv');
-            if (this.value === 'Outro') {
-                customDiv.classList.remove('hidden');
-                document.getElementById('customReason').required = true;
-            } else {
-                customDiv.classList.add('hidden');
-                document.getElementById('customReason').required = false;
-            }
-        });
-
-        document.getElementById('blockTimeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const dateTime = document.getElementById('blockDateTime').value;
-            const reason = document.getElementById('blockReason').value;
-            const customReason = document.getElementById('customReason').value;
-            const notes = document.getElementById('blockNotes').value;
-            
-            const finalReason = reason === 'Outro' ? customReason : reason;
-            
-            const blockData = {
-                id: Date.now().toString(),
-                owner: currentUser,
-                dateTime: dateTime,
-                reason: finalReason,
-                notes: notes,
-                createdAt: new Date().toISOString()
-            };
-
-            if (!blockedTimes[currentUser]) {
-                blockedTimes[currentUser] = [];
-            }
-            blockedTimes[currentUser].push(blockData);
-            saveData();
-            
-            document.getElementById('blockTimeModal').classList.add('hidden');
-            document.getElementById('blockTimeForm').reset();
-            document.getElementById('customReasonDiv').classList.add('hidden');
-            
-            if (currentView === 'calendar') {
-                generateCalendar();
-            } else {
-                loadDashboard();
-            }
-            showNotification('Horário bloqueado com sucesso!');
-        });
-
-        // Day schedule modal functionality
-        document.getElementById('closeDayScheduleModal').addEventListener('click', function() {
-            document.getElementById('dayScheduleModal').classList.add('hidden');
-        });
-
-        // Calendar functionality
-        document.getElementById('prevMonth').addEventListener('click', function() {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            generateCalendar();
-        });
-
-        document.getElementById('nextMonth').addEventListener('click', function() {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            generateCalendar();
-        });
-
-        function generateCalendar() {
-            const calendar = document.getElementById('calendar');
-            const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-            
-            document.getElementById('currentMonth').textContent = 
-                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            
-            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay());
-            
-            calendar.innerHTML = '';
-            
-            // Add day headers
-            dayNames.forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'p-2 text-center font-semibold text-gray-600 bg-gray-50';
-                dayHeader.textContent = day;
-                calendar.appendChild(dayHeader);
-            });
-            
-            // Add calendar days
-            for (let i = 0; i < 42; i++) {
-                const date = new Date(startDate);
-                date.setDate(startDate.getDate() + i);
-                
-                const dayElement = document.createElement('div');
-                dayElement.className = `calendar-day border border-gray-200 p-2 cursor-pointer ${
-                    date.getMonth() !== currentDate.getMonth() ? 'text-gray-400 bg-gray-50' : 'bg-white'
-                }`;
-                
-                const dayNumber = document.createElement('div');
-                dayNumber.className = 'font-semibold mb-1';
-                dayNumber.textContent = date.getDate();
-                dayElement.appendChild(dayNumber);
-                
-                // Add appointments and blocked times for this day
-                const dayAppointments = getDaySchedule(date);
-                dayAppointments.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = `text-xs p-1 mb-1 rounded text-white ${
-                        item.type === 'appointment' ? 'bg-blue-500' : 'bg-yellow-500'
-                    }`;
-                    itemElement.textContent = `${item.time} - ${item.title}`;
-                    dayElement.appendChild(itemElement);
-                });
-                
-                dayElement.addEventListener('click', () => openDaySchedule(date));
-                calendar.appendChild(dayElement);
-            }
-        }
-
-        function getDaySchedule(date) {
-            const dateStr = date.toDateString();
-            const schedule = [];
-            
-            // Add appointments
-            const userAppointments = appointments[currentUser] || [];
-            userAppointments.forEach(apt => {
-                if (new Date(apt.date).toDateString() === dateStr) {
-                    schedule.push({
-                        type: 'appointment',
-                        time: apt.time,
-                        title: apt.clientName,
-                        data: apt
-                    });
-                }
-            });
-            
-            // Add blocked times
-            const userBlocked = blockedTimes[currentUser] || [];
-            userBlocked.forEach(block => {
-                const blockDate = new Date(block.dateTime);
-                if (blockDate.toDateString() === dateStr) {
-                    schedule.push({
-                        type: 'blocked',
-                        time: blockDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-                        title: block.reason,
-                        data: block
-                    });
-                }
-            });
-            
-            return schedule.sort((a, b) => a.time.localeCompare(b.time));
-        }
-
-        function openDaySchedule(date) {
-            const daySchedule = getDaySchedule(date);
-            const dateStr = date.toLocaleDateString('pt-BR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            document.getElementById('dayScheduleTitle').textContent = `Agenda - ${dateStr}`;
-            
-            const content = document.getElementById('dayScheduleContent');
-            
-            if (daySchedule.length === 0) {
-                content.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <p class="mb-4">Nenhum compromisso agendado para este dia</p>
-                        <div class="space-y-2">
-                            <p class="text-sm">Horários disponíveis para agendamento:</p>
-                            <div class="grid grid-cols-3 gap-2 max-w-md mx-auto">
-                                ${getAvailableSlots(date).map(slot => 
-                                    `<button onclick="blockTimeSlot('${date.toISOString()}', '${slot}')" 
-                                     class="time-slot available text-white px-3 py-2 rounded-lg text-sm">
-                                        ${slot}
-                                    </button>`
-                                ).join('')}
-                            </div>
-                            <p class="text-xs text-gray-400 mt-2">Clique em um horário para bloqueá-lo</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                content.innerHTML = `
-                    <div class="space-y-4">
-                        ${daySchedule.map(item => `
-                            <div class="border border-gray-200 rounded-lg p-4 ${
-                                item.type === 'appointment' ? 'border-blue-200 bg-blue-50' : 'border-yellow-200 bg-yellow-50'
-                            }">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <div class="font-semibold text-lg">${item.time} - ${item.title}</div>
-                                        ${item.type === 'appointment' ? `
-                                            <div class="text-sm text-gray-600 mt-1">
-                                                <p>📞 ${item.data.clientPhone}</p>
-                                                ${item.data.clientEmail ? `<p>📧 ${item.data.clientEmail}</p>` : ''}
-                                                <p>🏠 ${item.data.propertyAddress}</p>
-                                                ${item.data.notes ? `<p class="mt-2 italic">${item.data.notes}</p>` : ''}
-                                            </div>
-                                        ` : `
-                                            <div class="text-sm text-gray-600 mt-1">
-                                                <p>🚫 Horário bloqueado</p>
-                                                ${item.data.notes ? `<p class="italic">${item.data.notes}</p>` : ''}
-                                            </div>
-                                        `}
-                                    </div>
-                                    <div class="flex space-x-2">
-                                        ${item.type === 'blocked' ? `
-                                            <button onclick="removeBlockedTime('${item.data.id}')" 
-                                                    class="text-red-600 hover:text-red-800 text-sm">
-                                                Desbloquear
-                                            </button>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                        
-                        <div class="mt-6 pt-4 border-t">
-                            <p class="text-sm text-gray-600 mb-2">Horários ainda disponíveis:</p>
-                            <div class="grid grid-cols-3 gap-2">
-                                ${getAvailableSlots(date).map(slot => 
-                                    `<button onclick="blockTimeSlot('${date.toISOString()}', '${slot}')" 
-                                     class="time-slot available text-white px-3 py-2 rounded-lg text-sm">
-                                        ${slot}
-                                    </button>`
-                                ).join('')}
-                            </div>
-                            ${getAvailableSlots(date).length > 0 ? 
-                                '<p class="text-xs text-gray-400 mt-2">Clique em um horário para bloqueá-lo</p>' : 
-                                '<p class="text-sm text-gray-500">Todos os horários estão ocupados</p>'
-                            }
-                        </div>
-                    </div>
-                `;
-            }
-            
-            document.getElementById('dayScheduleModal').classList.remove('hidden');
-        }
-
-        function getAvailableSlots(date) {
-            const slots = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-            const daySchedule = getDaySchedule(date);
-            const occupiedSlots = daySchedule.map(item => item.time);
-            
-            return slots.filter(slot => !occupiedSlots.includes(slot));
-        }
-
-        function blockTimeSlot(dateStr, time) {
-            const date = new Date(dateStr);
-            const dateTimeStr = `${date.toLocaleDateString('pt-BR')} às ${time}`;
-            
-            document.getElementById('blockDateTime').value = dateTimeStr;
-            document.getElementById('blockTimeModal').classList.remove('hidden');
-            
-            // Store the actual datetime for saving
-            const [hours, minutes] = time.split(':');
-            date.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-            document.getElementById('blockTimeModal').dataset.datetime = date.toISOString();
-        }
-
-        // Update the block time form to use the stored datetime
-        document.getElementById('blockTimeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const dateTime = document.getElementById('blockTimeModal').dataset.datetime;
-            const reason = document.getElementById('blockReason').value;
-            const customReason = document.getElementById('customReason').value;
-            const notes = document.getElementById('blockNotes').value;
-            
-            const finalReason = reason === 'Outro' ? customReason : reason;
-            
-            const blockData = {
-                id: Date.now().toString(),
-                owner: currentUser,
-                dateTime: dateTime,
-                reason: finalReason,
-                notes: notes,
-                createdAt: new Date().toISOString()
-            };
-
-            if (!blockedTimes[currentUser]) {
-                blockedTimes[currentUser] = [];
-            }
-            blockedTimes[currentUser].push(blockData);
-            saveData();
-            
-            document.getElementById('blockTimeModal').classList.add('hidden');
-            document.getElementById('blockTimeForm').reset();
-            document.getElementById('customReasonDiv').classList.add('hidden');
-            document.getElementById('dayScheduleModal').classList.add('hidden');
-            
-            if (currentView === 'calendar') {
-                generateCalendar();
-            } else {
-                loadDashboard();
-            }
-            showNotification('Horário bloqueado com sucesso!');
-        });
-
-        function removeBlockedTime(blockId) {
-            if (!blockedTimes[currentUser]) return;
-            
-            blockedTimes[currentUser] = blockedTimes[currentUser].filter(block => block.id !== blockId);
-            saveData();
-            
-            document.getElementById('dayScheduleModal').classList.add('hidden');
-            
-            if (currentView === 'calendar') {
-                generateCalendar();
-            } else {
-                loadDashboard();
-            }
-            showNotification('Horário desbloqueado com sucesso!');
-        }
-
-        function loadDashboard() {
+        // Inicializar dashboard
+        function initializeDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateSelector').value = today;
+            generateTimeSlots();
             loadProperties();
-            loadTodaySchedule();
-            loadUpcomingVisits();
-            updateStats();
+            updateSummary();
         }
 
-        function loadProperties() {
-            const propertiesList = document.getElementById('propertiesList');
-            const userProperties = properties[currentUser] || [];
-            
-            if (userProperties.length === 0) {
-                propertiesList.innerHTML = '<div class="text-center py-8 text-gray-500">Nenhum imóvel cadastrado ainda. Clique em "Adicionar Imóvel" para começar.</div>';
-                return;
-            }
+        // Gerar slots de horário
+        function generateTimeSlots() {
+            const selectedDate = document.getElementById('dateSelector').value;
+            const slotsContainer = document.getElementById('timeSlots');
+            slotsContainer.innerHTML = '';
 
-            propertiesList.innerHTML = userProperties.map(property => `
-                <div class="property-card border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all">
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 class="font-semibold text-lg">${property.type.charAt(0).toUpperCase() + property.type.slice(1)} - R$ ${parseInt(property.price).toLocaleString('pt-BR')}</h3>
-                            <p class="text-gray-600">${property.address}</p>
-                        </div>
-                        <button onclick="openScheduleModal('${property.id}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Agendar Visita</button>
-                    </div>
-                    <div class="flex space-x-4 text-sm text-gray-600 mb-3">
-                        ${property.rooms ? `<span>🛏️ ${property.rooms} quartos</span>` : ''}
-                        ${property.bathrooms ? `<span>🚿 ${property.bathrooms} banheiros</span>` : ''}
-                        ${property.area ? `<span>📐 ${property.area}m²</span>` : ''}
-                    </div>
-                    ${property.description ? `<p class="text-gray-700 text-sm">${property.description}</p>` : ''}
-                </div>
-            `).join('');
-        }
+            const startHour = 8;
+            const endHour = 18;
 
-        function loadTodaySchedule() {
-            const todaySchedule = document.getElementById('todaySchedule');
-            const today = new Date();
-            const todayItems = getDaySchedule(today);
-
-            if (todayItems.length === 0) {
-                todaySchedule.innerHTML = '<div class="text-gray-500 text-sm">Nenhum compromisso para hoje</div>';
-                return;
-            }
-
-            todaySchedule.innerHTML = todayItems.map(item => `
-                <div class="border-l-4 ${item.type === 'appointment' ? 'border-blue-500' : 'border-yellow-500'} pl-3 py-2">
-                    <div class="font-medium">${item.time}</div>
-                    <div class="text-sm text-gray-600">${item.title}</div>
-                    ${item.type === 'appointment' ? 
-                        `<div class="text-xs text-gray-500">${item.data.propertyAddress}</div>` : 
-                        `<div class="text-xs text-gray-500">Horário bloqueado</div>`
+            for (let hour = startHour; hour < endHour; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    const slotKey = `${selectedDate}_${timeString}`;
+                    
+                    let slotClass = 'available';
+                    let slotText = timeString;
+                    
+                    // Verificar se está bloqueado
+                    if (storage.blockedTimes[currentUser] && storage.blockedTimes[currentUser][selectedDate]) {
+                        const blockedSlots = storage.blockedTimes[currentUser][selectedDate];
+                        const isBlocked = blockedSlots.some(block => {
+                            const slotTime = hour * 60 + minute;
+                            const blockStart = parseInt(block.startTime.split(':')[0]) * 60 + parseInt(block.startTime.split(':')[1]);
+                            const blockEnd = parseInt(block.endTime.split(':')[0]) * 60 + parseInt(block.endTime.split(':')[1]);
+                            return slotTime >= blockStart && slotTime < blockEnd;
+                        });
+                        
+                        if (isBlocked) {
+                            slotClass = 'blocked';
+                            const blockInfo = blockedSlots.find(block => {
+                                const slotTime = hour * 60 + minute;
+                                const blockStart = parseInt(block.startTime.split(':')[0]) * 60 + parseInt(block.startTime.split(':')[1]);
+                                const blockEnd = parseInt(block.endTime.split(':')[0]) * 60 + parseInt(block.endTime.split(':')[1]);
+                                return slotTime >= blockStart && slotTime < blockEnd;
+                            });
+                            slotText = `${timeString}\n${blockInfo.reason}`;
+                        }
                     }
-                </div>
-            `).join('');
+                    
+                    // Verificar agendamentos
+                    if (storage.appointments[currentUser] && storage.appointments[currentUser][slotKey]) {
+                        slotClass = 'occupied';
+                    }
+
+                    const slot = document.createElement('div');
+                    slot.className = `time-slot ${slotClass} text-white text-center py-3 px-2 rounded-lg text-sm font-medium`;
+                    slot.textContent = slotText;
+                    slot.dataset.time = timeString;
+                    slot.dataset.date = selectedDate;
+
+                    if (slotClass === 'available') {
+                        slot.addEventListener('click', () => openBookingModal(selectedDate, timeString));
+                    }
+
+                    slotsContainer.appendChild(slot);
+                }
+            }
+            updateSummary();
         }
 
-        function loadUpcomingVisits() {
-            const upcomingVisits = document.getElementById('upcomingVisits');
-            const userAppointments = appointments[currentUser] || [];
-            const today = new Date();
-            
-            const upcoming = userAppointments
-                .filter(apt => new Date(apt.date) > today)
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .slice(0, 5);
+        // Modal para bloquear horário
+        document.getElementById('blockTimeBtn').addEventListener('click', () => {
+            document.getElementById('blockTimeModal').classList.remove('hidden');
+            document.getElementById('blockDate').value = document.getElementById('dateSelector').value;
+        });
 
-            if (upcoming.length === 0) {
-                upcomingVisits.innerHTML = '<div class="text-gray-500 text-sm">Nenhuma visita agendada</div>';
+        document.getElementById('cancelBlock').addEventListener('click', () => {
+            document.getElementById('blockTimeModal').classList.add('hidden');
+        });
+
+        document.getElementById('confirmBlock').addEventListener('click', () => {
+            const date = document.getElementById('blockDate').value;
+            const startTime = document.getElementById('blockStartTime').value;
+            const endTime = document.getElementById('blockEndTime').value;
+            const reason = document.getElementById('blockReason').value;
+
+            if (!date || !startTime || !endTime || !reason) {
+                showNotification('Preencha todos os campos!', 'error');
                 return;
             }
 
-            upcomingVisits.innerHTML = upcoming.map(apt => `
-                <div class="border-l-4 border-green-500 pl-3 py-2">
-                    <div class="font-medium">${new Date(apt.date).toLocaleDateString('pt-BR')} - ${apt.time}</div>
-                    <div class="text-sm text-gray-600">${apt.clientName}</div>
-                    <div class="text-xs text-gray-500">${apt.propertyAddress}</div>
-                </div>
-            `).join('');
-        }
+            if (!storage.blockedTimes[currentUser]) {
+                storage.blockedTimes[currentUser] = {};
+            }
+            if (!storage.blockedTimes[currentUser][date]) {
+                storage.blockedTimes[currentUser][date] = [];
+            }
 
-        function updateStats() {
-            const userProperties = properties[currentUser] || [];
-            const userAppointments = appointments[currentUser] || [];
-            const userBlocked = blockedTimes[currentUser] || [];
-            const today = new Date().toDateString();
-            const weekStart = new Date();
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-
-            document.getElementById('totalProperties').textContent = userProperties.length;
-            document.getElementById('todayVisits').textContent = userAppointments.filter(apt => new Date(apt.date).toDateString() === today).length;
-            document.getElementById('weekVisits').textContent = userAppointments.filter(apt => new Date(apt.date) >= weekStart).length;
-            document.getElementById('blockedSlots').textContent = userBlocked.length;
-        }
-
-        function openScheduleModal(propertyId) {
-            const property = properties[currentUser].find(p => p.id === propertyId);
-            if (!property) return;
-
-            document.getElementById('scheduleModal').classList.remove('hidden');
-            document.getElementById('scheduleContent').innerHTML = `
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-2">${property.type.charAt(0).toUpperCase() + property.type.slice(1)} - R$ ${parseInt(property.price).toLocaleString('pt-BR')}</h3>
-                    <p class="text-gray-600">${property.address}</p>
-                </div>
-                
-                <form id="scheduleForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                            <input type="text" id="clientName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
-                            <input type="tel" id="clientPhone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="(11) 99999-9999" required>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email (opcional)</label>
-                        <input type="email" id="clientEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Data da Visita</label>
-                            <input type="date" id="visitDate" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required min="${new Date().toISOString().split('T')[0]}">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Horário</label>
-                            <select id="visitTime" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
-                                <option value="">Selecione o horário</option>
-                                <option value="08:00">08:00</option>
-                                <option value="09:00">09:00</option>
-                                <option value="10:00">10:00</option>
-                                <option value="11:00">11:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="15:00">15:00</option>
-                                <option value="16:00">16:00</option>
-                                <option value="17:00">17:00</option>
-                                <option value="18:00">18:00</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
-                        <textarea id="visitNotes" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Informações adicionais sobre a visita..."></textarea>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 class="font-medium text-blue-800 mb-2">📱 Notificações WhatsApp</h4>
-                        <p class="text-sm text-blue-700">
-                            Após confirmar o agendamento, tanto você quanto o cliente receberão uma notificação no WhatsApp com os detalhes da visita.
-                            <br><small class="text-blue-600">* Funcionalidade disponível com integração de API WhatsApp</small>
-                        </p>
-                    </div>
-                    <div class="flex justify-end space-x-4 pt-4">
-                        <button type="button" onclick="document.getElementById('scheduleModal').classList.add('hidden')" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancelar</button>
-                        <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Agendar Visita</button>
-                    </div>
-                </form>
-            `;
-
-            document.getElementById('scheduleForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const appointmentData = {
-                    id: Date.now().toString(),
-                    propertyId: propertyId,
-                    propertyAddress: property.address,
-                    clientName: document.getElementById('clientName').value,
-                    clientPhone: document.getElementById('clientPhone').value,
-                    clientEmail: document.getElementById('clientEmail').value,
-                    date: document.getElementById('visitDate').value,
-                    time: document.getElementById('visitTime').value,
-                    notes: document.getElementById('visitNotes').value,
-                    status: 'agendado',
-                    createdAt: new Date().toISOString()
-                };
-
-                if (!appointments[currentUser]) {
-                    appointments[currentUser] = [];
-                }
-                appointments[currentUser].push(appointmentData);
-                saveData();
-                
-                document.getElementById('scheduleModal').classList.add('hidden');
-                
-                if (currentView === 'dashboard') {
-                    loadDashboard();
-                } else {
-                    generateCalendar();
-                }
-                
-                // Simulate WhatsApp notification (in real implementation, this would call the API)
-                showNotification('Visita agendada! Notificações WhatsApp serão enviadas quando a API estiver integrada.');
+            storage.blockedTimes[currentUser][date].push({
+                startTime,
+                endTime,
+                reason
             });
+
+            storage.save();
+            document.getElementById('blockTimeModal').classList.add('hidden');
+            
+            // Limpar formulário
+            document.getElementById('blockStartTime').value = '';
+            document.getElementById('blockEndTime').value = '';
+            document.getElementById('blockReason').value = '';
+            
+            generateTimeSlots();
+            showNotification('Horário bloqueado com sucesso!');
+        });
+
+        // Modal para compartilhar URL
+        document.getElementById('shareUrlBtn').addEventListener('click', () => {
+            const userCode = storage.users[currentUser].urlCode;
+            const personalUrl = `${window.location.origin}${window.location.pathname}?c=${userCode}`;
+            document.getElementById('personalUrl').value = personalUrl;
+            document.getElementById('shareUrlModal').classList.remove('hidden');
+        });
+
+        document.getElementById('copyUrlBtn').addEventListener('click', () => {
+            const urlField = document.getElementById('personalUrl');
+            urlField.select();
+            document.execCommand('copy');
+            showNotification('Link copiado para a área de transferência!');
+        });
+
+        document.getElementById('closeUrlModal').addEventListener('click', () => {
+            document.getElementById('shareUrlModal').classList.add('hidden');
+        });
+
+        // Seletor de data
+        document.getElementById('dateSelector').addEventListener('change', generateTimeSlots);
+
+        // Modal de propriedades
+        document.getElementById('addPropertyBtn').addEventListener('click', () => {
+            document.getElementById('propertyModal').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelProperty').addEventListener('click', () => {
+            document.getElementById('propertyModal').classList.add('hidden');
+        });
+
+        document.getElementById('saveProperty').addEventListener('click', () => {
+            const address = document.getElementById('propertyAddress').value;
+            const type = document.getElementById('propertyType').value;
+            const price = document.getElementById('propertyPrice').value;
+
+            if (!address || !price) {
+                showNotification('Preencha endereço e valor!', 'error');
+                return;
+            }
+
+            if (!storage.properties[currentUser]) {
+                storage.properties[currentUser] = [];
+            }
+
+            storage.properties[currentUser].push({
+                id: Date.now(),
+                address,
+                type,
+                price
+            });
+
+            storage.save();
+            document.getElementById('propertyModal').classList.add('hidden');
+            
+            // Limpar formulário
+            document.getElementById('propertyAddress').value = '';
+            document.getElementById('propertyPrice').value = '';
+            
+            loadProperties();
+            showNotification('Propriedade adicionada com sucesso!');
+        });
+
+        // Carregar propriedades
+        function loadProperties() {
+            const container = document.getElementById('propertiesList');
+            container.innerHTML = '';
+
+            if (storage.properties[currentUser]) {
+                storage.properties[currentUser].forEach(property => {
+                    const div = document.createElement('div');
+                    div.className = 'property-card bg-gray-50 p-3 rounded-lg transition-all duration-200';
+                    div.innerHTML = `
+                        <div class="font-medium text-sm">${property.type}</div>
+                        <div class="text-xs text-gray-600 mb-1">${property.address}</div>
+                        <div class="text-sm font-bold text-green-600">${property.price}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
         }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('username').focus();
-        });
+        // Atualizar resumo
+        function updateSummary() {
+            const selectedDate = document.getElementById('dateSelector').value;
+            const slots = document.querySelectorAll('.time-slot');
+            
+            let available = 0, occupied = 0, blocked = 0;
+            
+            slots.forEach(slot => {
+                if (slot.classList.contains('available')) available++;
+                else if (slot.classList.contains('occupied')) occupied++;
+                else if (slot.classList.contains('blocked')) blocked++;
+            });
+
+            document.getElementById('scheduledCount').textContent = occupied;
+            document.getElementById('availableCount').textContent = available;
+            document.getElementById('blockedCount').textContent = blocked;
+        }
+
+        // Verificar se há código de corretor na URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const realtorCode = urlParams.get('c');
+        
+        if (realtorCode) {
+            // Encontrar corretor pelo código
+            const realtor = Object.values(storage.users).find(user => user.urlCode === realtorCode);
+            if (realtor) {
+                showNotification(`Agendamento com ${realtor.name}`, 'success');
+                // Aqui você pode implementar a tela de agendamento para clientes
+            }
+        }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'985ae561723bcaf8',t:'MTc1ODk3NTAwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'985af368070082df',t:'MTc1ODk3NTU4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
