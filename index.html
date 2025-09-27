@@ -41,6 +41,7 @@
                     <div><label class="block text-sm">Cidade</label><input type="text" id="regCity" class="w-full mt-1 p-2 border rounded-lg" required></div>
                 </div>
                 <hr class="my-2">
+                <div><label class="block text-sm">Usuário (para login)</label><input type="text" id="regUsername" class="w-full mt-1 p-2 border rounded-lg" required></div>
                 <div><label class="block text-sm">Senha</label><input type="password" id="regPassword" class="w-full mt-1 p-2 border rounded-lg" required></div>
                 <button type="button" id="registerButton" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold">Cadastrar</button>
             </form>
@@ -70,7 +71,7 @@
             <div id="client-access" class="section hidden"></div>
         </main>
     </div>
-
+    
     <script>
         window.addEventListener('load', function() {
             let brokerInfo = null;
@@ -79,36 +80,22 @@
             const apiUrl = 'https://sheetdb.io/api/v1/bi8ruina76il1';
 
             function setupEventListeners() {
-                const loginButton = document.getElementById('loginButton');
-                if (loginButton) loginButton.addEventListener('click', handleLogin);
-
-                const registerButton = document.getElementById('registerButton');
-                if (registerButton) registerButton.addEventListener('click', handleRegister);
-                
-                const showRegister = document.getElementById('showRegister');
-                if (showRegister) showRegister.addEventListener('click', showRegisterForm);
-                
-                const showLogin = document.getElementById('showLogin');
-                if (showLogin) showLogin.addEventListener('click', showLoginForm);
-
-                const logoutButton = document.getElementById('logoutButton');
-                if (logoutButton) logoutButton.addEventListener('click', logout);
-
-                const togglePassword = document.getElementById('togglePassword');
-                const passwordInput = document.getElementById('loginPassword');
-                if (togglePassword && passwordInput) {
-                    togglePassword.addEventListener('click', function () {
-                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                        passwordInput.setAttribute('type', type);
-                        this.textContent = type === 'password' ? '👁️' : '🙈';
-                    });
-                }
-
+                document.getElementById('loginButton').addEventListener('click', handleLogin);
+                document.getElementById('registerButton').addEventListener('click', handleRegister);
+                document.getElementById('showRegister').addEventListener('click', showRegisterForm);
+                document.getElementById('showLogin').addEventListener('click', showLoginForm);
+                document.getElementById('logoutButton').addEventListener('click', logout);
+                document.getElementById('togglePassword').addEventListener('click', function() {
+                    const passInput = document.getElementById('loginPassword');
+                    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passInput.setAttribute('type', type);
+                    this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.addEventListener('click', () => showSection(btn.dataset.section));
                 });
             }
-            
+
             async function loadData() {
                 try {
                     const [propertiesRes, appointmentsRes] = await Promise.all([
@@ -119,14 +106,16 @@
                     appointments = (await appointmentsRes.json());
                 } catch (error) { showNotification("Não foi possível carregar dados da planilha.", "error"); }
             }
-
+            
             async function handleLogin() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
                 if (!email || !password) { showNotification('Preencha todos os campos.', 'error'); return; }
 
-                let loginSuccess = false, user;
-                if (email.toLowerCase() === 'demo@corretor.com' && password === '123456') {
+                let loginSuccess = false;
+                let user;
+
+                if (email === 'demo@corretor.com' && password === '123456') {
                     loginSuccess = true;
                     user = { name: 'Corretor Demo', email: 'demo@corretor.com' };
                 } else {
@@ -134,7 +123,10 @@
                     try {
                         const res = await fetch(`${apiUrl}/search?sheet=Usuarios&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
                         const foundUsers = await res.json();
-                        if(foundUsers.length > 0) { loginSuccess = true; user = foundUsers[0]; }
+                        if(foundUsers.length > 0) {
+                            loginSuccess = true;
+                            user = foundUsers[0];
+                        }
                     } catch(e) { showNotification('Erro ao conectar.', 'error'); return; }
                 }
 
@@ -144,13 +136,16 @@
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainApp').classList.remove('hidden');
                     await showSection('dashboard');
-                } else { showNotification('Email ou senha incorretos!', 'error'); }
+                } else {
+                    showNotification('Email ou senha incorretos!', 'error');
+                }
             }
 
              async function handleRegister() {
                 const newUser = { 
                     name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
                     phone: document.getElementById('regPhone').value, city: document.getElementById('regCity').value,
+                    username: document.getElementById('regUsername').value,
                     password: document.getElementById('regPassword').value
                 };
                 if(!newUser.name || !newUser.email || !newUser.password) {
@@ -161,12 +156,22 @@
                 try {
                     const checkRes = await fetch(`${apiUrl}/search?sheet=Usuarios&email=${encodeURIComponent(newUser.email)}`);
                     const existingUsers = await checkRes.json();
-                    if (existingUsers.length > 0) { showNotification('Este email já está em uso!', 'error'); return; }
+                    if (existingUsers.length > 0) {
+                        showNotification('Este email já está em uso!', 'error');
+                        return;
+                    }
                     
-                    await fetch(`${apiUrl}?sheet=Usuarios`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: [newUser] }) });
-                    showNotification('Cadastro realizado com sucesso!', 'success');
+                    await fetch(`${apiUrl}?sheet=Usuarios`, { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ data: [newUser] }) 
+                    });
+                    
+                    showNotification('Cadastro realizado com sucesso! Faça o login.', 'success');
                     showLoginForm();
-                } catch(e) { showNotification('Erro no cadastro.', 'error'); }
+                } catch(e) { 
+                    showNotification('Erro no cadastro. Tente novamente.', 'error'); 
+                }
             }
             
             async function showSection(sectionName) {
@@ -187,13 +192,14 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-white rounded-xl shadow p-6"><p class="text-sm">Meus Imóveis</p><p class="text-3xl font-bold">${myProperties.length}</p></div>
                             <div class="bg-white rounded-xl shadow p-6"><p class="text-sm">Próximas Visitas</p><p class="text-3xl font-bold">0</p></div>
-                        </div>`;
+                        </div>
+                    `;
                 } else if (sectionName === 'properties') {
-                     section.innerHTML = `<h1>Meus Imóveis</h1><p>Em breve...</p>`; 
+                     section.innerHTML = `<h1>Meus Imóveis</h1><p>A lista de imóveis e o botão de cadastro aparecerão aqui.</p>`;
                 } else if (sectionName === 'schedule') {
-                     section.innerHTML = `<h1>Minha Agenda</h1><p>Em breve...</p>`;
+                     section.innerHTML = `<h1>Minha Agenda</h1><p>O calendário e os agendamentos pendentes aparecerão aqui.</p>`;
                 } else if (sectionName === 'client-access') {
-                    section.innerHTML = `<h1>Acesso Cliente</h1><p>Em breve...</p>`;
+                    section.innerHTML = `<h1>Acesso Cliente</h1><p>O link de compartilhamento para seus clientes aparecerá aqui.</p>`;
                 }
             }
 
