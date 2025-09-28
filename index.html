@@ -15,7 +15,6 @@
         .available { background: linear-gradient(135deg, #10b981, #059669); cursor: pointer; }
         .occupied { background: linear-gradient(135deg, #ef4444, #dc2626); cursor: not-allowed; }
         .pending { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .blocked { background: linear-gradient(135deg, #64748b, #475569); cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
@@ -41,7 +40,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
             <div class="text-center mb-8"><h1 class="text-3xl font-bold">📝 Cadastro de Corretor</h1><p class="text-gray-600">Crie sua conta</p></div>
             <form class="space-y-4">
-                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div><label class="block text-sm">Nome Completo</label><input type="text" id="regName" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div><label class="block text-sm">Email</label><input type="email" id="regEmail" class="w-full mt-1 p-2 border rounded-lg" required></div>
                     <div><label class="block text-sm">WhatsApp</label><input type="tel" id="regPhone" class="w-full mt-1 p-2 border rounded-lg" required></div>
@@ -61,12 +60,12 @@
                 <div class="flex justify-between items-center py-4">
                     <div class="flex items-center space-x-4"><h1 class="text-2xl font-bold">🏠 Agenda do Corretor</h1></div>
                     <nav class="hidden md:flex space-x-6">
-                        <button onclick="showSection('dashboard')" class="nav-btn">Dashboard</button>
-                        <button onclick="showSection('properties')" class="nav-btn">Imóveis</button>
-                        <button onclick="showSection('schedule')" class="nav-btn">Agenda</button>
-                        <button onclick="showSection('client-access')" class="nav-btn">Acesso Cliente</button>
+                        <button data-section="dashboard" class="nav-btn">Dashboard</button>
+                        <button data-section="properties" class="nav-btn">Imóveis</button>
+                        <button data-section="schedule" class="nav-btn">Agenda</button>
+                        <button data-section="client-access" class="nav-btn">Acesso Cliente</button>
                     </nav>
-                    <div class="flex items-center space-x-4"><span class="text-sm text-gray-600">Olá, <span id="currentUser"></span></span><button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg">Sair</button></div>
+                    <div class="flex items-center space-x-4"><span class="text-sm text-gray-600">Olá, <span id="currentUser"></span></span><button id="logoutButton" class="bg-red-500 text-white px-4 py-2 rounded-lg">Sair</button></div>
                 </div>
             </div>
         </header>
@@ -85,19 +84,23 @@
             let brokerInfo = null;
             let properties = [];
             let appointments = [];
-            const apiUrl = 'https://sheetdb.io/api/v1/4au1wi3z5kq16'; // Sua API funcional
-            const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00'; // Sua chave ImgBB
+            const apiUrl = 'https://sheetdb.io/api/v1/4au1wi3z5kq16';
+            const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
             function setupEventListeners() {
                 document.getElementById('loginButton').addEventListener('click', handleLogin);
                 document.getElementById('registerButton').addEventListener('click', handleRegister);
                 document.getElementById('showRegister').addEventListener('click', showRegisterForm);
                 document.getElementById('showLogin').addEventListener('click', showLoginForm);
+                document.getElementById('logoutButton').addEventListener('click', logout);
                 document.getElementById('togglePassword').addEventListener('click', function() {
                     const passInput = document.getElementById('loginPassword');
                     const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
                     passInput.setAttribute('type', type);
                     this.textContent = type === 'password' ? '👁️' : '🙈';
+                });
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', () => showSection(btn.dataset.section));
                 });
             }
 
@@ -114,7 +117,8 @@
             
             async function handleLogin() {
                 const email = document.getElementById('loginEmail').value, password = document.getElementById('loginPassword').value;
-                if (!email || !password) { showNotification('Preencha todos os campos.', 'error'); return; }
+                if (!email || !password) { showNotification('Preencha todos os campos.', 'warning'); return; }
+                
                 let loginSuccess = false, user;
                 if (email.toLowerCase() === 'demo@corretor.com' && password === '123456') {
                     loginSuccess = true;
@@ -127,6 +131,7 @@
                         if (foundUsers.length > 0) { loginSuccess = true; user = foundUsers[0]; }
                     } catch (e) { showNotification('Erro ao conectar.', 'error'); return; }
                 }
+
                 if (loginSuccess) {
                     brokerInfo = user;
                     document.getElementById('currentUser').textContent = brokerInfo.name;
@@ -165,32 +170,39 @@
                 else if (sectionName === 'client-access') renderClientAccess();
             }
 
-            function renderDashboard() { /* ... código completo da função ... */ }
-            function renderProperties() { /* ... código completo da função ... */ }
-            window.showAddPropertyForm = function() { /* ... código completo da função ... */ }
-            window.hideAddPropertyForm = function() { /* ... código completo da função ... */ }
-            async function handlePropertySave(e) { /* ... código completo da função ... */ }
-            async function handleImageUploads(files) { /* ... código completo da função ... */ }
-            function renderSchedule() { /* ... código completo da função ... */ }
-            function generateCalendar(myAppointments) { /* ... código completo da função ... */ }
-            function loadPendingAppointments(myAppointments) { /* ... código completo da função ... */ }
-            window.confirmAppointment = async function(id) { /* ... código completo da função ... */ }
-            window.rejectAppointment = async function(id) { /* ... código completo da função ... */ }
-            function renderClientAccess() { /* ... código completo da função ... */ }
+            // --- FUNÇÕES DE RENDERIZAÇÃO DAS SEÇÕES ---
+            function renderDashboard() { /* Implementação completa do dashboard aqui */ }
+            function renderProperties() { /* Implementação completa de imóveis aqui */ }
+            function renderSchedule() { /* Implementação completa da agenda aqui */ }
+            function renderClientAccess() { /* Implementação completa do acesso cliente aqui */ }
             
-            function showRegisterForm() {
+            // --- LÓGICA DA INTERFACE DO CLIENTE ---
+             async function showClientInterface() {
                 document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('registerScreen').classList.remove('hidden');
-            }
-            function showLoginForm() {
-                document.getElementById('registerScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
-            }
-            window.logout = function() {
-                brokerInfo = null;
                 document.getElementById('mainApp').classList.add('hidden');
-                document.getElementById('loginScreen').classList.remove('hidden');
+                const clientUI = document.getElementById('clientInterface');
+                clientUI.classList.remove('hidden');
+                clientUI.innerHTML = `<header class="bg-white shadow-lg"><div class="max-w-4xl mx-auto px-4 py-6 text-center"><h1 class="text-3xl font-bold">🏠 Agenda do Corretor</h1></div></header><main id="clientMain" class="max-w-6xl mx-auto px-4 py-8"></main>`;
+                await loadData();
+                showClientPropertyList();
             }
+
+            function showClientPropertyList() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const brokerEmail = urlParams.get('broker');
+                document.getElementById('clientMain').innerHTML = `<h2 class="text-2xl font-bold text-center mb-6">Imóveis Disponíveis</h2><div id="clientPropertiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>`;
+                const container = document.getElementById('clientPropertiesList');
+                const brokerProperties = properties.filter(p => p.corretor_email && brokerEmail && p.corretor_email.toLowerCase() === brokerEmail.toLowerCase());
+                container.innerHTML = brokerProperties.length === 0 ? '<div class="col-span-full text-center py-12 text-gray-500">Nenhum imóvel disponível para este corretor.</div>' : brokerProperties.map(p => {
+                    const photo = (p.photos && p.photos.length > 0) ? p.photos[0] : 'https://via.placeholder.com/300x200?text=Imóvel';
+                    return `<div class="property-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer" onclick="showClientPropertyDetail('${p.id}')"><img src="${photo}" alt="${p.title}" class="w-full h-48 object-cover"><div class="p-6"><h3 class="text-xl font-bold mb-2">${p.title}</h3><p class="text-sm text-gray-600 mb-4">${p.description.substring(0,100)}...</p><div class="flex justify-between items-center"><span class="text-2xl font-bold text-green-600">R$ ${parseFloat(p.price).toLocaleString('pt-BR')}</span></div></div></div>`;
+                }).join('');
+            }
+
+            // --- FUNÇÕES GLOBAIS E AUXILIARES ---
+            function showRegisterForm() { document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('registerScreen').classList.remove('hidden'); }
+            function showLoginForm() { document.getElementById('registerScreen').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
+            function logout() { window.location.href = window.location.pathname; }
             function showNotification(message, type = 'info') {
                 const container = document.getElementById('notifications');
                 const notification = document.createElement('div');
@@ -201,9 +213,11 @@
                 setTimeout(() => { if (notification.parentElement) notification.remove(); }, 3000);
             }
 
+            // --- INICIALIZAÇÃO ---
             setupEventListeners();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('client') === 'true') { showClientInterface(); }
         });
     </script>
 </body>
 </html>
-
