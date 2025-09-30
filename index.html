@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Agenda do Corretor - Sistema de Agendamento</title>
-  <link rel="icon" href="data:,"> <script src="https://cdn/tailwindcss.com"></script>
+  <link rel="icon" href="data:,"> <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { box-sizing: border-box; }
     .notification { animation: slideIn 0.25s ease-out; }
@@ -109,7 +109,7 @@
   </div>
 
   <script>
-    const apiUrl = 'https://sheetdb.io/api/v1/m0z6jtbloc0lk'; // <-- SUA NOVA API JÁ ATUALIZADA
+    const apiUrl = 'https://sheetdb.io/api/v1/m0z6jtbloc0lk'; // <-- SUA ÚLTIMA API!
     const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
     let currentBroker = null;
@@ -230,6 +230,7 @@
         if (result && result.created) {
             showAlert('Cadastro realizado com sucesso! Você já pode fazer o login.', 'success');
             document.getElementById('registerForm').reset();
+            await fetchData(); // Recarrega os dados para incluir o novo usuário
         }
     }
 
@@ -459,7 +460,7 @@
                         <h3 class="font-semibold text-lg">${prop.title}</h3>
                         <p class="text-slate-600 text-sm mb-2">${prop.address}</p>
                         <p class="text-slate-800 font-bold mb-3">${prop.price}</p>
-                        <p class="text-sm text-slate-500 mb-4 flex-grow">${prop.description.substring(0, 100)}...</p>
+                        <p class="text-sm text-slate-500 mb-4 flex-grow">${prop.description ? prop.description.substring(0, 100) + '...' : ''}</p>
                         <div class="text-xs bg-gray-100 p-2 rounded mb-4">
                             <p><strong>Corretor:</strong> ${brokerName}</p>
                             <p><strong>Contato:</strong> ${brokerPhone}</p>
@@ -482,6 +483,11 @@
         const propertyId = e.target.dataset.propertyId;
         const brokerId = e.target.dataset.brokerId;
         const property = properties.find(p => p.id === propertyId);
+
+        if (!property) {
+            showAlert('Imóvel não encontrado.', 'error');
+            return;
+        }
 
         const formHtml = `
             <h3 class="text-xl font-semibold mb-2">Agendar Visita</h3>
@@ -570,6 +576,7 @@
         }
         
         showOnly('loginSection');
+        fetchData(); // Carrega os dados iniciais ao abrir a página
     });
   </script>
 </body>
