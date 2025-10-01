@@ -10,52 +10,51 @@
     body { box-sizing: border-box; }
     .notification { animation: slideIn 0.25s ease-out; }
     @keyframes slideIn { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+    /* Estilo para placeholder de inputs no tema escuro */
+    .dark-input::placeholder { color: #94a3b8; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-  <div id="app" class="min-h-screen flex items-start justify-center p-6">
-    <div class="w-full max-w-5xl bg-white/80 rounded-2xl shadow-lg p-6">
-      <header class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold text-slate-800">Agenda do Corretor</h1>
-        <div>
-          <button id="btn-show-login" class="px-3 py-1 mr-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Login</button>
-          <button id="btn-show-register" class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">Cadastrar</button>
+<body class="bg-slate-900">
+  <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6">
+    
+    <section id="loginSection" class="w-full max-w-md">
+        <h1 class="text-4xl font-bold text-center text-white mb-10 tracking-wider">
+            Agenda do Corretor
+        </h1>
+        
+        <div class="space-y-6">
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-5 text-center">Login do Corretor</h2>
+                <form id="loginForm" class="space-y-4">
+                    <input id="loginEmail" type="email" required placeholder="Email" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
+                    <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
+                    <button class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">Entrar</button>
+                </form>
+            </div>
+
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg text-center">
+                 <h2 class="text-2xl font-semibold text-white mb-4">Acesso para Clientes</h2>
+                 <p class="text-slate-400 mb-5">Veja os imóveis disponíveis de todos os nossos corretores.</p>
+                 <button id="btn-show-client-interface" type="button" class="w-full px-4 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors">Ver Vitrine de Imóveis</button>
+            </div>
+            
+            <div class="bg-slate-800 p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold text-white mb-5 text-center">Ainda não tem conta?</h2>
+                <form id="registerForm" class="space-y-4">
+                    <input id="regName" type="text" required placeholder="Nome Completo" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+                    <input id="regEmail" type="email" required placeholder="Email" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+                    <input id="regPhone" type="text" placeholder="Telefone" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+                    <input id="regPassword" type="password" required placeholder="Crie uma Senha" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+                    <button class="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">Criar Conta</button>
+                </form>
+            </div>
         </div>
-      </header>
+    </section>
 
-      <div id="alert" class="hidden notification mb-4 p-3 rounded border"></div>
+    <div class="w-full max-w-5xl">
+        <div id="alert" class="hidden notification mb-4 p-3 rounded border"></div>
 
-      <main>
-        <!-- LOGIN E CADASTRO -->
-        <section id="loginSection">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="p-4 bg-white rounded shadow">
-              <h2 class="font-semibold mb-3">Entrar (corretores)</h2>
-              <form id="loginForm" class="space-y-3">
-                <input id="loginEmail" type="email" required placeholder="Email" class="w-full p-2 border rounded" />
-                <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-2 border rounded" />
-                <div class="flex items-center gap-2">
-                  <button class="px-3 py-2 bg-indigo-600 text-white rounded">Entrar</button>
-                  <button id="btn-show-client-interface" type="button" class="px-3 py-2 bg-gray-200 rounded">Ver imóveis</button>
-                </div>
-              </form>
-            </div>
-
-            <div class="p-4 bg-white rounded shadow">
-              <h2 class="font-semibold mb-3">Cadastrar corretor</h2>
-              <form id="registerForm" class="space-y-3">
-                <input id="regName" type="text" required placeholder="Nome" class="w-full p-2 border rounded" />
-                <input id="regEmail" type="email" required placeholder="Email" class="w-full p-2 border rounded" />
-                <input id="regPhone" type="text" placeholder="Telefone" class="w-full p-2 border rounded" />
-                <input id="regPassword" type="password" required placeholder="Senha" class="w-full p-2 border rounded" />
-                <button class="px-3 py-2 bg-green-600 text-white rounded">Criar conta</button>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- DASHBOARD -->
-        <section id="dashboardSection" class="hidden">
+        <section id="dashboardSection" class="hidden bg-white/90 rounded-2xl shadow-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Painel</h2>
             <div class="flex items-center gap-2">
@@ -63,36 +62,24 @@
               <button id="btn-logout" class="px-3 py-1 bg-red-500 text-white rounded">Sair</button>
             </div>
           </div>
-
-          <!-- LINK DE DIVULGAÇÃO -->
-          <div class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-              <label for="shareLink" class="block text-sm font-medium text-indigo-800">Link para enviar aos clientes:</label>
+          <div id="shareLinkContainer" class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+              <label for="shareLink" class="block text-sm font-medium text-indigo-800">Seu Link de Divulgação Exclusivo:</label>
               <div class="flex items-center gap-2 mt-1">
                   <input type="text" id="shareLink" readonly class="w-full p-2 border border-indigo-300 bg-white rounded-md text-sm">
                   <button id="btn-copy-link" class="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">Copiar</button>
-                  <button id="btn-open-link" class="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">Abrir</button>
               </div>
           </div>
-
           <div class="grid md:grid-cols-3 gap-4">
-            <!-- Imóveis -->
             <div class="md:col-span-2 p-4 bg-white rounded shadow">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="font-semibold">Meus Imóveis</h3>
-                <button id="btn-new-property" class="px-3 py-1 bg-indigo-600 text-white rounded">Novo imóvel</button>
-              </div>
+              <div class="flex items-center justify-between mb-3"><h3 class="font-semibold">Meus Imóveis</h3><button id="btn-new-property" class="px-3 py-1 bg-indigo-600 text-white rounded">Novo imóvel</button></div>
               <div id="propertiesList" class="space-y-3"></div>
             </div>
-
-            <!-- Agenda -->
             <div class="p-4 bg-white rounded shadow">
-              <h3 class="font-semibold mb-3">Minha Agenda</h3>
-              <div id="appointmentsList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-2"></div>
-              <hr class="my-3" />
+              <div class="flex items-center justify-between mb-3"><h3 class="font-semibold">Minha Agenda</h3></div>
+              <div id="appointmentsList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-2"></div><hr class="my-3" />
               <h4 class="font-medium mb-2">Bloquear horário pessoal</h4>
               <form id="blockTimeForm" class="space-y-2">
-                <input id="blockDate" type="date" required class="w-full p-2 border rounded" />
-                <input id="blockTime" type="time" required class="w-full p-2 border rounded" />
+                <input id="blockDate" type="date" required class="w-full p-2 border rounded" /><input id="blockTime" type="time" required class="w-full p-2 border rounded" />
                 <input id="blockReason" type="text" placeholder="Motivo (opcional)" class="w-full p-2 border rounded" />
                 <button class="px-3 py-1 bg-yellow-500 rounded text-yellow-900">Bloquear</button>
               </form>
@@ -100,30 +87,24 @@
           </div>
         </section>
 
-        <!-- CLIENTE -->
-        <section id="clientSection" class="hidden">
-          <div class="flex items-center justify-between mb-4">
-            <h2 id="client-title" class="text-xl font-semibold">Propriedades disponíveis</h2>
-            <button id="btn-back-to-login" class="px-3 py-1 bg-gray-200 rounded">Voltar</button>
-          </div>
+        <section id="clientSection" class="hidden bg-white/90 rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4"><h2 id="client-title" class="text-xl font-semibold">Propriedades disponíveis</h2><button id="btn-back-to-login" class="px-3 py-1 bg-gray-200 rounded">Voltar</button></div>
           <div id="clientProperties" class="grid md:grid-cols-3 gap-4"></div>
         </section>
-      </main>
     </div>
   </div>
 
-  <!-- MODAL -->
-  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 p-4 z-50">
-    <div class="bg-white rounded-lg shadow p-4 w-full max-w-2xl">
+  <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/60 p-4 z-50">
+    <div class="bg-white rounded-lg shadow p-6 w-full max-w-2xl">
       <div id="modalContent"></div>
-      <div class="mt-3 text-right">
-        <button id="modalClose" class="px-3 py-1 bg-gray-200 rounded">Fechar</button>
+      <div class="mt-4 text-right">
+        <button id="modalClose" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Fechar</button>
       </div>
     </div>
   </div>
 
   <script>
-    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet'; // troque pela sua nova API
+    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet';
     const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
     let currentBroker = null;
@@ -132,135 +113,293 @@
     let brokers = [];
 
     function showOnly(sectionId) {
-      ['loginSection','dashboardSection','clientSection'].forEach(s => document.getElementById(s).classList.add('hidden'));
-      document.getElementById(sectionId).classList.remove('hidden');
+      const allSections = ['loginSection','dashboardSection','clientSection'];
+      const container = document.querySelector('.w-full.max-w-5xl');
+      const loginContainer = document.querySelector('.w-full.max-w-md');
+      
+      allSections.forEach(s => {
+          const el = document.getElementById(s);
+          if(el) el.classList.add('hidden');
+      });
+      
+      if (sectionId === 'loginSection') {
+          loginContainer.classList.remove('hidden');
+          container.classList.add('hidden');
+      } else {
+          loginContainer.classList.add('hidden');
+          container.classList.remove('hidden');
+          document.getElementById(sectionId).classList.remove('hidden');
+      }
     }
 
     function showAlert(message, type = 'success') {
-      const alertEl = document.getElementById('alert');
-      alertEl.textContent = message;
-      alertEl.className = 'notification mb-4 p-3 rounded border ';
-      alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
-      alertEl.classList.remove('hidden');
-      setTimeout(() => alertEl.classList.add('hidden'), 4000);
+        const alertContainer = document.getElementById('loginSection').classList.contains('hidden') 
+            ? document.querySelector('.w-full.max-w-5xl') 
+            : document.getElementById('loginSection');
+        
+        const alertEl = alertContainer.querySelector('#alert') || document.getElementById('alert');
+        
+        if (!alertEl) { // Fallback to main alert if needed
+             const mainAlert = document.getElementById('alert');
+             mainAlert.textContent = message;
+             mainAlert.className = 'notification mb-4 p-3 rounded border ';
+             mainAlert.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
+             mainAlert.classList.remove('hidden');
+             setTimeout(() => mainAlert.classList.add('hidden'), 4000);
+             return;
+        }
+
+        alertEl.textContent = message;
+        alertEl.className = 'notification mb-4 p-3 rounded border ';
+        alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
+        alertEl.classList.remove('hidden');
+        setTimeout(() => alertEl.classList.add('hidden'), 4000);
+    }
+
+    function showModal(htmlContent) {
+        document.getElementById('modalContent').innerHTML = htmlContent;
+        document.getElementById('modal').classList.add('flex');
+        document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+        document.getElementById('modal').classList.remove('flex');
+        document.getElementById('modalContent').innerHTML = '';
     }
 
     async function fetchData() {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      brokers = data.filter(i => i.type === 'broker');
-      properties = data.filter(i => i.type === 'property');
-      appointments = data.filter(i => i.type === 'appointment');
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('API fetch failed.');
+            const data = await response.json();
+            brokers = data.filter(item => item.type === 'broker');
+            properties = data.filter(item => item.type === 'property');
+            appointments = data.filter(item => item.type === 'appointment');
+        } catch (error) {
+            console.error("fetchData Error:", error);
+            showAlert('Não foi possível carregar os dados.', 'error');
+        }
     }
 
     async function postData(data) {
-      await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: [data] })
-      });
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: [data] })
+            });
+            if (!response.ok) throw new Error('API post failed.');
+            return await response.json();
+        } catch (error) {
+            console.error("postData Error:", error);
+            showAlert('Ocorreu um erro ao salvar.', 'error');
+        }
     }
 
-    // Registro
     async function handleRegister(e) {
-      e.preventDefault();
-      const newBroker = {
-        id: `broker_${Date.now()}`,
-        type: 'broker',
-        name: regName.value,
-        email: regEmail.value,
-        phone: regPhone.value,
-        password: regPassword.value
-      };
-      if (brokers.find(b => b.email === newBroker.email)) return showAlert('Email já cadastrado', 'error');
-      await postData(newBroker);
-      showAlert('Cadastro realizado! Faça login.', 'success');
-      registerForm.reset(); await fetchData();
+        e.preventDefault();
+        const newBroker = {
+            id: `broker_${Date.now()}`, type: 'broker',
+            name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
+            phone: document.getElementById('regPhone').value, password: document.getElementById('regPassword').value,
+        };
+        if (!newBroker.name || !newBroker.email || !newBroker.password) return showAlert('Nome, email e senha são obrigatórios.', 'error');
+        if (brokers.find(b => b.email === newBroker.email)) return showAlert('Este email já está cadastrado.', 'error');
+        
+        await postData(newBroker);
+        showAlert('Cadastro realizado com sucesso! Faça o login.', 'success');
+        document.getElementById('registerForm').reset();
+        await fetchData();
     }
 
-    // Login
     async function handleLogin(e) {
-      e.preventDefault();
-      const broker = brokers.find(b => b.email === loginEmail.value && b.password === loginPassword.value);
-      if (broker) {
-        currentBroker = broker; showOnly('dashboardSection'); renderDashboard();
-      } else showAlert('Email ou senha incorretos.', 'error');
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        const broker = brokers.find(b => b.email === email && b.password === pass);
+        if (broker) {
+            currentBroker = broker;
+            showOnly('dashboardSection');
+            renderDashboard();
+        } else {
+            showAlert('Email ou senha incorretos.', 'error');
+        }
     }
 
-    function handleLogout() { currentBroker = null; showOnly('loginSection'); loginForm.reset(); }
-
+    function handleLogout() {
+        currentBroker = null;
+        showOnly('loginSection');
+        document.getElementById('loginForm').reset();
+    }
+    
     function renderDashboard() {
-      currentBroker && (currentBrokerName.textContent = `Olá, ${currentBroker.name.split(' ')[0]}!`);
-      shareLink.value = `${window.location.href.split('?')[0]}?brokerId=${currentBroker.id}`;
-      renderPropertiesList(properties.filter(p => p.brokerId === currentBroker.id));
-      renderAppointmentsList(appointments.filter(a => a.brokerId === currentBroker.id));
+        if (!currentBroker) return;
+        document.getElementById('currentBrokerName').textContent = `Olá, ${currentBroker.name.split(' ')[0]}!`;
+        const shareLinkInput = document.getElementById('shareLink');
+        const baseUrl = window.location.href.split('?')[0];
+        shareLinkInput.value = `${baseUrl}?brokerId=${currentBroker.id}`;
+        
+        const myProperties = properties.filter(p => p.brokerId === currentBroker.id);
+        const myAppointments = appointments.filter(a => a.brokerId === currentBroker.id).sort((a,b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+        renderPropertiesList(myProperties);
+        renderAppointmentsList(myAppointments);
     }
-
-    function renderPropertiesList(list) {
-      propertiesList.innerHTML = list.length ? list.map(p => `<div class="p-3 border rounded bg-slate-50"><p class="font-semibold">${p.title}</p><p class="text-sm">${p.address}</p></div>`).join('') : '<p class="text-slate-500">Nenhum imóvel.</p>';
-    }
-
-    function renderAppointmentsList(list) {
-      appointmentsList.innerHTML = list.length ? list.map(a => `<div class="p-2 bg-blue-50 rounded"><p>${a.date} ${a.time}</p><p class="text-xs">${a.clientName}</p></div>`).join('') : '<p class="text-slate-500">Nenhum agendamento.</p>';
-    }
-
-    function copyShareLink() { shareLink.select(); document.execCommand('copy'); showAlert('Link copiado!', 'success'); }
-    function openShareLink() { window.open(shareLink.value, '_blank'); }
-
-    // Cliente
-    async function showClientInterface(brokerId=null) {
-      showOnly('clientSection'); if (!brokers.length) await fetchData();
-      const props = brokerId ? properties.filter(p => p.brokerId === brokerId) : properties;
-      client-title.textContent = brokerId ? `Imóveis de ${brokers.find(b => b.id===brokerId)?.name}` : 'Propriedades disponíveis';
-      btn-back-to-login.classList.toggle('hidden', !!brokerId);
-      clientProperties.innerHTML = props.map(p => `
-        <div class="bg-white rounded shadow flex flex-col">
-          <img src="${p.imageUrl||'https://via.placeholder.com/400x250'}" class="w-full h-48 object-cover">
-          <div class="p-4 flex flex-col flex-grow">
-            <h3 class="font-semibold">${p.title}</h3>
-            <p class="text-sm text-slate-600">${p.address}</p>
-            <p class="font-bold">${p.price}</p>
-            <button data-id="${p.id}" data-broker="${p.brokerId}" class="schedule-btn mt-auto bg-green-600 text-white px-3 py-2 rounded">Agendar</button>
-          </div>
-        </div>`).join('');
-    }
-
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('schedule-btn')) {
-        const propId = e.target.dataset.id, brokerId = e.target.dataset.broker;
-        showModal(`<form id="apptForm" class="space-y-2">
-          <input type="hidden" id="apptPropId" value="${propId}">
-          <input type="hidden" id="apptBrokerId" value="${brokerId}">
-          <input id="apptClientName" placeholder="Seu nome" required class="w-full p-2 border rounded">
-          <input id="apptClientEmail" placeholder="Email" required class="w-full p-2 border rounded">
-          <input id="apptDate" type="date" required class="w-full p-2 border rounded">
-          <input id="apptTime" type="time" required class="w-full p-2 border rounded">
-          <button class="bg-green-600 text-white px-3 py-2 rounded">Confirmar</button>
-        </form>`);
-        document.getElementById('apptForm').addEventListener('submit', async ev => {
-          ev.preventDefault();
-          await postData({ id:`appt_${Date.now()}`,type:'appointment',brokerId,propertyId:propId,
-            clientName:apptClientName.value,clientEmail:apptClientEmail.value,date:apptDate.value,time:apptTime.value });
-          closeModal(); showAlert('Agendamento enviado!', 'success');
+    
+    function copyShareLink() {
+        const shareLinkInput = document.getElementById('shareLink');
+        shareLinkInput.select();
+        shareLinkInput.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+            showAlert('Link copiado!', 'success');
         });
-      }
-    });
+    }
 
-    // Listeners
-    loginForm.addEventListener('submit', handleLogin);
-    registerForm.addEventListener('submit', handleRegister);
-    btn-logout.addEventListener('click', handleLogout);
-    btn-copy-link.addEventListener('click', copyShareLink);
-    btn-open-link.addEventListener('click', openShareLink);
-    btn-show-client-interface.addEventListener('click', ()=>showClientInterface());
-    btn-back-to-login.addEventListener('click', ()=>showOnly('loginSection'));
-    modalClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', e=>e.target.id==='modal'&&closeModal());
+    function renderPropertiesList(brokerProperties) {
+        const listEl = document.getElementById('propertiesList');
+        listEl.innerHTML = brokerProperties.length === 0 ? '<p class="text-slate-500">Você ainda não cadastrou nenhum imóvel.</p>' : brokerProperties.map(prop => `
+            <div class="p-3 border rounded-lg bg-slate-50 flex justify-between items-center">
+                <div><p class="font-semibold">${prop.title || 'Imóvel sem título'}</p><p class="text-sm text-slate-600">${prop.address || 'Endereço não informado'}</p></div>
+            </div>`).join('');
+    }
+
+    function renderAppointmentsList(brokerAppointments) {
+        const listEl = document.getElementById('appointmentsList');
+        if (brokerAppointments.length === 0) { listEl.innerHTML = '<p class="text-slate-500">Nenhum agendamento.</p>'; return; }
+        listEl.innerHTML = brokerAppointments.map(appt => {
+            const property = properties.find(p => p.id === appt.propertyId);
+            const propertyTitle = property ? property.title : 'Compromisso Pessoal';
+            const isBlocked = appt.clientName === 'Horário Bloqueado';
+            const date = new Date(`${appt.date}T${appt.time}`);
+            if (isNaN(date)) return '';
+            const formattedDate = date.toLocaleDateString('pt-BR', {timeZone: 'America/Sao_Paulo'});
+            const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+            return `<div class="p-2 rounded ${isBlocked ? 'bg-yellow-100' : 'bg-blue-50'}"><p class="font-semibold">${formattedDate} às ${formattedTime}</p><p class="text-xs">${isBlocked ? `Motivo: ${appt.details || 'Pessoal'}` : `${appt.clientName} - ${propertyTitle}`}</p></div>`;
+        }).join('');
+    }
+
+    function handleNewProperty() {
+        const formHtml = `<h3 class="text-xl font-semibold mb-4">Cadastrar Imóvel</h3><form id="propertyForm" class="space-y-3"><input type="text" id="propTitle" placeholder="Título do Imóvel" required class="w-full p-2 border rounded"><input type="text" id="propAddress" placeholder="Endereço" required class="w-full p-2 border rounded"><textarea id="propDescription" placeholder="Descrição" class="w-full p-2 border rounded"></textarea><input type="text" id="propPrice" placeholder="Preço" required class="w-full p-2 border rounded"><label class="block text-sm font-medium text-slate-700">Foto</label><input type="file" id="propImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"><div class="text-right"><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Salvar</button></div></form>`;
+        showModal(formHtml);
+        document.getElementById('propertyForm').addEventListener('submit', handlePropertyFormSubmit);
+    }
+
+    async function handlePropertyFormSubmit(e) {
+        e.preventDefault();
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true; submitButton.textContent = 'Salvando...';
+        let imageUrl = '';
+        const imageFile = document.getElementById('propImage').files[0];
+        if (imageFile) {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) imageUrl = result.data.url; else throw new Error('Falha no upload.');
+            } catch (error) {
+                showAlert('Upload da imagem falhou.', 'error');
+                submitButton.disabled = false; submitButton.textContent = 'Salvar'; return;
+            }
+        }
+        const newProperty = {
+            id: `prop_${Date.now()}`, type: 'property', brokerId: currentBroker.id,
+            title: document.getElementById('propTitle').value, address: document.getElementById('propAddress').value,
+            description: document.getElementById('propDescription').value, price: document.getElementById('propPrice').value, imageUrl: imageUrl,
+        };
+        await postData(newProperty);
+        showAlert('Imóvel cadastrado!', 'success');
+        closeModal(); await fetchData(); renderDashboard();
+    }
+
+    async function handleBlockTime(e) {
+        e.preventDefault();
+        const newBlockedSlot = {
+            id: `appt_${Date.now()}`, type: 'appointment', brokerId: currentBroker.id,
+            propertyId: 'personal', clientName: 'Horário Bloqueado',
+            date: document.getElementById('blockDate').value, time: document.getElementById('blockTime').value,
+            details: document.getElementById('blockReason').value
+        };
+        if (!newBlockedSlot.date || !newBlockedSlot.time) return showAlert('Data e hora são obrigatórias.', 'error');
+        await postData(newBlockedSlot);
+        showAlert('Horário bloqueado!', 'success');
+        document.getElementById('blockTimeForm').reset();
+        await fetchData(); renderDashboard();
+    }
+    
+    async function showClientInterface(brokerId = null) {
+        showOnly('clientSection');
+        if (!properties.length && !brokers.length) await fetchData();
+        let propertiesToShow = brokerId ? properties.filter(p => p.brokerId === brokerId) : properties;
+        const broker = brokerId ? brokers.find(b => b.id === brokerId) : null;
+        document.getElementById('client-title').textContent = broker ? `Imóveis de ${broker.name}` : 'Propriedades Disponíveis';
+        document.getElementById('btn-back-to-login').classList.toggle('hidden', !!brokerId);
+        renderClientProperties(propertiesToShow);
+    }
+    
+    function renderClientProperties(propertiesToShow) {
+        const listEl = document.getElementById('clientProperties');
+        if (propertiesToShow.length === 0) { listEl.innerHTML = '<p class="col-span-3 text-center text-slate-500">Nenhum imóvel disponível.</p>'; return; }
+        listEl.innerHTML = propertiesToShow.map(prop => {
+            const broker = brokers.find(b => b.id === prop.brokerId);
+            return `<div class="bg-white rounded-lg shadow overflow-hidden flex flex-col"><img src="${prop.imageUrl || 'https://via.placeholder.com/400x250.png?text=Sem+Foto'}" alt="${prop.title}" class="w-full h-48 object-cover"><div class="p-4 flex flex-col flex-grow"><h3 class="font-semibold text-lg">${prop.title}</h3><p class="text-slate-600 text-sm mb-2">${prop.address}</p><p class="text-slate-800 font-bold mb-3">${prop.price}</p><p class="text-sm text-slate-500 mb-4 flex-grow">${prop.description ? prop.description.substring(0, 100) + '...' : ''}</p><div class="text-xs bg-gray-100 p-2 rounded mb-4"><p><strong>Corretor:</strong> ${broker ? broker.name : 'N/A'}</p><p><strong>Contato:</strong> ${broker ? broker.phone : 'N/A'}</p></div><button data-property-id="${prop.id}" data-broker-id="${prop.brokerId}" class="schedule-visit-btn mt-auto w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">Agendar Visita</button></div></div>`;
+        }).join('');
+    }
+
+    function handleScheduleVisitClick(e) {
+        if (!e.target.matches('.schedule-visit-btn')) return;
+        const { propertyId, brokerId } = e.target.dataset;
+        const property = properties.find(p => p.id === propertyId);
+        if (!property) return showAlert('Imóvel não encontrado.', 'error');
+        const formHtml = `<h3 class="text-xl font-semibold mb-2">Agendar Visita</h3><p class="mb-4">Imóvel: <strong>${property.title}</strong></p><form id="clientAppointmentForm" class="space-y-3"><input type="hidden" id="apptPropId" value="${propertyId}"><input type="hidden" id="apptBrokerId" value="${brokerId}"><input type="text" id="apptClientName" placeholder="Seu nome completo" required class="w-full p-2 border rounded"><input type="email" id="apptClientEmail" placeholder="Seu email" required class="w-full p-2 border rounded"><input type="tel" id="apptClientPhone" placeholder="Seu telefone" required class="w-full p-2 border rounded"><div class="grid grid-cols-2 gap-3"><input type="date" id="apptDate" required class="w-full p-2 border rounded"><input type="time" id="apptTime" required class="w-full p-2 border rounded"></div><div class="text-right"><button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Confirmar</button></div></form>`;
+        showModal(formHtml);
+        document.getElementById('clientAppointmentForm').addEventListener('submit', handleClientAppointmentSubmit);
+    }
+
+    async function handleClientAppointmentSubmit(e) {
+        e.preventDefault();
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        submitButton.disabled = true; submitButton.textContent = 'Enviando...';
+        const newAppointment = {
+            id: `appt_${Date.now()}`, type: 'appointment',
+            brokerId: document.getElementById('apptBrokerId').value, propertyId: document.getElementById('apptPropId').value,
+            clientName: document.getElementById('apptClientName').value, clientEmail: document.getElementById('apptClientEmail').value,
+            clientPhone: document.getElementById('apptClientPhone').value, date: document.getElementById('apptDate').value,
+            time: document.getElementById('apptTime').value, details: 'Agendado pelo cliente',
+        };
+        await postData(newAppointment);
+        closeModal();
+        showAlert('Agendamento solicitado com sucesso!', 'success');
+    }
 
     window.addEventListener('load', async () => {
-      await fetchData();
-      const brokerId = new URLSearchParams(window.location.search).get('brokerId');
-      brokerId ? showClientInterface(brokerId) : showOnly('loginSection');
+        const safeOn = (id, event, fn) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(event, fn);
+        };
+        
+        safeOn('loginForm', 'submit', handleLogin);
+        safeOn('registerForm', 'submit', handleRegister);
+        safeOn('btn-show-client-interface', 'click', () => showClientInterface());
+        safeOn('btn-back-to-login', 'click', () => { showOnly('loginSection'); window.history.pushState({}, '', window.location.pathname); });
+        safeOn('btn-logout', 'click', handleLogout);
+        safeOn('btn-new-property', 'click', handleNewProperty);
+        safeOn('blockTimeForm', 'submit', handleBlockTime);
+        safeOn('btn-copy-link', 'click', copyShareLink);
+        safeOn('modalClose', 'click', closeModal);
+        safeOn('modal', 'click', (e) => e.target.id === 'modal' && closeModal());
+        document.getElementById('clientProperties').addEventListener('click', handleScheduleVisitClick);
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const specificBrokerId = urlParams.get('brokerId');
+        
+        await fetchData();
+        
+        if (specificBrokerId) {
+            showClientInterface(specificBrokerId);
+        } else {
+            showOnly('loginSection');
+        }
     });
   </script>
 </body>
