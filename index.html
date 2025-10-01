@@ -10,19 +10,24 @@
     body { box-sizing: border-box; }
     .notification { animation: slideIn 0.25s ease-out; }
     @keyframes slideIn { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-    /* Estilo para placeholder de inputs no tema escuro */
     .dark-input::placeholder { color: #94a3b8; }
   </style>
 </head>
 <body class="bg-slate-900">
-  <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6">
+  <div id="app" class="min-h-screen flex flex-col items-center justify-center p-6 relative">
     
-    <section id="loginSection" class="w-full max-w-md">
+    <div class="absolute top-6 right-6 z-10">
+        <button id="btn-show-client-interface" type="button" class="px-5 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-md">
+            Acesso Cliente
+        </button>
+    </div>
+
+    <section id="loginSection" class="w-full max-w-4xl">
         <h1 class="text-4xl font-bold text-center text-white mb-10 tracking-wider">
             Agenda do Corretor
         </h1>
         
-        <div class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-8">
             <div class="bg-slate-800 p-8 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-semibold text-white mb-5 text-center">Login do Corretor</h2>
                 <form id="loginForm" class="space-y-4">
@@ -30,12 +35,6 @@
                     <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-3 bg-slate-700 text-white border-2 border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
                     <button class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">Entrar</button>
                 </form>
-            </div>
-
-            <div class="bg-slate-800 p-8 rounded-xl shadow-lg text-center">
-                 <h2 class="text-2xl font-semibold text-white mb-4">Acesso para Clientes</h2>
-                 <p class="text-slate-400 mb-5">Veja os imóveis disponíveis de todos os nossos corretores.</p>
-                 <button id="btn-show-client-interface" type="button" class="w-full px-4 py-3 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors">Ver Vitrine de Imóveis</button>
             </div>
             
             <div class="bg-slate-800 p-8 rounded-xl shadow-lg">
@@ -54,7 +53,7 @@
     <div class="w-full max-w-5xl">
         <div id="alert" class="hidden notification mb-4 p-3 rounded border"></div>
 
-        <section id="dashboardSection" class="hidden bg-white/90 rounded-2xl shadow-lg p-6">
+        <section id="dashboardSection" class="hidden bg-white/95 rounded-2xl shadow-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Painel</h2>
             <div class="flex items-center gap-2">
@@ -87,7 +86,7 @@
           </div>
         </section>
 
-        <section id="clientSection" class="hidden bg-white/90 rounded-2xl shadow-lg p-6">
+        <section id="clientSection" class="hidden bg-white/95 rounded-2xl shadow-lg p-6">
           <div class="flex items-center justify-between mb-4"><h2 id="client-title" class="text-xl font-semibold">Propriedades disponíveis</h2><button id="btn-back-to-login" class="px-3 py-1 bg-gray-200 rounded">Voltar</button></div>
           <div id="clientProperties" class="grid md:grid-cols-3 gap-4"></div>
         </section>
@@ -115,7 +114,7 @@
     function showOnly(sectionId) {
       const allSections = ['loginSection','dashboardSection','clientSection'];
       const container = document.querySelector('.w-full.max-w-5xl');
-      const loginContainer = document.querySelector('.w-full.max-w-md');
+      const loginContainer = document.querySelector('.w-full.max-w-4xl');
       
       allSections.forEach(s => {
           const el = document.getElementById(s);
@@ -137,18 +136,12 @@
             ? document.querySelector('.w-full.max-w-5xl') 
             : document.getElementById('loginSection');
         
-        const alertEl = alertContainer.querySelector('#alert') || document.getElementById('alert');
-        
-        if (!alertEl) { // Fallback to main alert if needed
-             const mainAlert = document.getElementById('alert');
-             mainAlert.textContent = message;
-             mainAlert.className = 'notification mb-4 p-3 rounded border ';
-             mainAlert.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
-             mainAlert.classList.remove('hidden');
-             setTimeout(() => mainAlert.classList.add('hidden'), 4000);
-             return;
+        let alertEl = alertContainer.querySelector('#alert');
+        if (!alertEl) {
+             const mainAlertContainer = document.querySelector('.w-full.max-w-5xl');
+             alertEl = mainAlertContainer.querySelector('#alert');
         }
-
+        
         alertEl.textContent = message;
         alertEl.className = 'notification mb-4 p-3 rounded border ';
         alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
@@ -263,6 +256,7 @@
             </div>`).join('');
     }
 
+    // ----- ATUALIZADO: Renderização da Agenda -----
     function renderAppointmentsList(brokerAppointments) {
         const listEl = document.getElementById('appointmentsList');
         if (brokerAppointments.length === 0) { listEl.innerHTML = '<p class="text-slate-500">Nenhum agendamento.</p>'; return; }
@@ -270,11 +264,15 @@
             const property = properties.find(p => p.id === appt.propertyId);
             const propertyTitle = property ? property.title : 'Compromisso Pessoal';
             const isBlocked = appt.clientName === 'Horário Bloqueado';
+            
+            const mainText = isBlocked ? 'Horário Bloqueado' : appt.clientName;
+            const subText = isBlocked ? (appt.details || 'Motivo pessoal') : propertyTitle;
+
             const date = new Date(`${appt.date}T${appt.time}`);
             if (isNaN(date)) return '';
-            const formattedDate = date.toLocaleDateString('pt-BR', {timeZone: 'America/Sao_Paulo'});
-            const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-            return `<div class="p-2 rounded ${isBlocked ? 'bg-yellow-100' : 'bg-blue-50'}"><p class="font-semibold">${formattedDate} às ${formattedTime}</p><p class="text-xs">${isBlocked ? `Motivo: ${appt.details || 'Pessoal'}` : `${appt.clientName} - ${propertyTitle}`}</p></div>`;
+            const formattedDate = date.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+            const formattedTime = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+            return `<div class="p-2 rounded ${isBlocked ? 'bg-yellow-100' : 'bg-blue-50'}"><p class="font-semibold">${mainText}</p><p class="text-xs">${subText} - ${formattedDate} às ${formattedTime}</p></div>`;
         }).join('');
     }
 
