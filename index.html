@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Agenda do Corretor - Sistema de Agendamento</title>
-  <link rel="icon" href="data:,"> <script src="https://cdn.tailwindcss.com"></script> <style>
+  <link rel="icon" href="data:,"> <script src="https://cdn.tailwindcss.com"></script>
+  <style>
     body { box-sizing: border-box; }
     .notification { animation: slideIn 0.25s ease-out; }
     @keyframes slideIn { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
@@ -108,7 +109,7 @@
   </div>
 
   <script>
-    const apiUrl = 'https://sheetdb.io/api/v1/m0z6jtbloc0lk'; // <-- SUA ÚLTIMA API!
+    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet'; // <-- SUA API FINAL E CORRETA!
     const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
     let currentBroker = null;
@@ -163,6 +164,10 @@
     // =================================================================================
 
     async function fetchData() {
+        if (apiUrl === 'SUA_NOVA_API_FINAL_AQUI') {
+            showAlert('Erro: A URL da API não foi configurada no código.', 'error');
+            return;
+        }
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error('Falha ao buscar dados da API.');
