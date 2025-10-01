@@ -26,8 +26,8 @@
       <div id="alert" class="hidden notification mb-4 p-3 rounded border"></div>
 
       <main>
-        <!-- LOGIN -->
-        <section id="loginSection" class="">
+        <!-- LOGIN E CADASTRO -->
+        <section id="loginSection">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="p-4 bg-white rounded shadow">
               <h2 class="font-semibold mb-3">Entrar (corretores)</h2>
@@ -36,7 +36,7 @@
                 <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-2 border rounded" />
                 <div class="flex items-center gap-2">
                   <button class="px-3 py-2 bg-indigo-600 text-white rounded">Entrar</button>
-                  <button id="btn-show-client-interface" type="button" class="px-3 py-2 bg-gray-200 rounded">Ver todos os imóveis</button>
+                  <button id="btn-show-client-interface" type="button" class="px-3 py-2 bg-gray-200 rounded">Ver imóveis</button>
                 </div>
               </form>
             </div>
@@ -63,18 +63,19 @@
               <button id="btn-logout" class="px-3 py-1 bg-red-500 text-white rounded">Sair</button>
             </div>
           </div>
-          
-          <!-- Link de Divulgação -->
-          <div id="shareLinkContainer" class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-            <label for="shareLink" class="block text-sm font-medium text-indigo-800">Link para enviar aos clientes:</label>
-            <div class="flex items-center gap-2 mt-1">
-              <input type="text" id="shareLink" readonly class="w-full p-2 border border-indigo-300 bg-white rounded-md text-sm">
-              <button id="btn-copy-link" class="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">Copiar</button>
-              <button id="btn-open-link" class="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">Abrir</button>
-            </div>
+
+          <!-- LINK DE DIVULGAÇÃO -->
+          <div class="mb-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+              <label for="shareLink" class="block text-sm font-medium text-indigo-800">Link para enviar aos clientes:</label>
+              <div class="flex items-center gap-2 mt-1">
+                  <input type="text" id="shareLink" readonly class="w-full p-2 border border-indigo-300 bg-white rounded-md text-sm">
+                  <button id="btn-copy-link" class="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700">Copiar</button>
+                  <button id="btn-open-link" class="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">Abrir</button>
+              </div>
           </div>
 
           <div class="grid md:grid-cols-3 gap-4">
+            <!-- Imóveis -->
             <div class="md:col-span-2 p-4 bg-white rounded shadow">
               <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold">Meus Imóveis</h3>
@@ -83,10 +84,9 @@
               <div id="propertiesList" class="space-y-3"></div>
             </div>
 
+            <!-- Agenda -->
             <div class="p-4 bg-white rounded shadow">
-              <div class="flex items-center justify-between mb-3">
-                <h3 class="font-semibold">Minha Agenda</h3>
-              </div>
+              <h3 class="font-semibold mb-3">Minha Agenda</h3>
               <div id="appointmentsList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-2"></div>
               <hr class="my-3" />
               <h4 class="font-medium mb-2">Bloquear horário pessoal</h4>
@@ -112,7 +112,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- MODAL -->
   <div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/40 p-4 z-50">
     <div class="bg-white rounded-lg shadow p-4 w-full max-w-2xl">
       <div id="modalContent"></div>
@@ -123,7 +123,7 @@
   </div>
 
   <script>
-    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet'; // troque se precisar
+    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet'; // troque pela sua nova API
     const imgbbApiKey = '6993ede4d1aa2ecce3147a7ee06c0b00';
 
     let currentBroker = null;
@@ -145,144 +145,122 @@
       setTimeout(() => alertEl.classList.add('hidden'), 4000);
     }
 
-    function showModal(htmlContent) {
-      document.getElementById('modalContent').innerHTML = htmlContent;
-      document.getElementById('modal').classList.add('flex');
-      document.getElementById('modal').classList.remove('hidden');
-    }
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-      document.getElementById('modal').classList.remove('flex');
-      document.getElementById('modalContent').innerHTML = '';
-    }
-
     async function fetchData() {
-      try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        brokers = data.filter(i => i.type === 'broker');
-        properties = data.filter(i => i.type === 'property');
-        appointments = data.filter(i => i.type === 'appointment');
-      } catch (err) { console.error(err); showAlert('Erro ao carregar dados','error'); }
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      brokers = data.filter(i => i.type === 'broker');
+      properties = data.filter(i => i.type === 'property');
+      appointments = data.filter(i => i.type === 'appointment');
     }
 
     async function postData(data) {
-      try {
-        const res = await fetch(apiUrl, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({data:[data]})
-        });
-        return await res.json();
-      } catch (err) { console.error(err); showAlert('Erro ao salvar','error'); }
+      await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: [data] })
+      });
     }
 
+    // Registro
     async function handleRegister(e) {
       e.preventDefault();
       const newBroker = {
-        id:`broker_${Date.now()}`, type:'broker',
-        name:regName.value, email:regEmail.value, phone:regPhone.value,
-        password:regPassword.value
+        id: `broker_${Date.now()}`,
+        type: 'broker',
+        name: regName.value,
+        email: regEmail.value,
+        phone: regPhone.value,
+        password: regPassword.value
       };
-      if (!newBroker.name || !newBroker.email || !newBroker.password) return showAlert('Preencha todos os campos','error');
-      if (brokers.find(b=>b.email===newBroker.email)) return showAlert('Email já cadastrado','error');
-      await postData(newBroker); showAlert('Cadastro realizado!','success');
+      if (brokers.find(b => b.email === newBroker.email)) return showAlert('Email já cadastrado', 'error');
+      await postData(newBroker);
+      showAlert('Cadastro realizado! Faça login.', 'success');
       registerForm.reset(); await fetchData();
     }
 
+    // Login
     async function handleLogin(e) {
       e.preventDefault();
-      const email=loginEmail.value, pass=loginPassword.value;
-      const broker=brokers.find(b=>b.email===email && b.password===pass);
-      if(broker){ currentBroker=broker; showOnly('dashboardSection'); renderDashboard(); }
-      else showAlert('Email ou senha inválidos','error');
-    }
-    function handleLogout(){ currentBroker=null; showOnly('loginSection'); loginForm.reset(); }
-
-    function renderDashboard(){
-      if(!currentBroker) return;
-      currentBrokerName.textContent=`Olá, ${currentBroker.name.split(' ')[0]}!`;
-      const baseUrl = window.location.href.split('?')[0];
-      shareLink.value=`${baseUrl}?brokerId=${currentBroker.id}`;
-      // Imóveis e Agenda
-      renderPropertiesList(properties.filter(p=>p.brokerId===currentBroker.id));
-      renderAppointmentsList(appointments.filter(a=>a.brokerId===currentBroker.id));
+      const broker = brokers.find(b => b.email === loginEmail.value && b.password === loginPassword.value);
+      if (broker) {
+        currentBroker = broker; showOnly('dashboardSection'); renderDashboard();
+      } else showAlert('Email ou senha incorretos.', 'error');
     }
 
-    function copyShareLink(){ shareLink.select(); document.execCommand('copy'); showAlert('Link copiado!'); }
-    function openShareLink(){ window.open(shareLink.value,'_blank'); }
+    function handleLogout() { currentBroker = null; showOnly('loginSection'); loginForm.reset(); }
 
-    function renderPropertiesList(props){
-      propertiesList.innerHTML = props.length===0 ? '<p class="text-slate-500">Nenhum imóvel.</p>' :
-        props.map(p=>`<div class="p-3 border rounded bg-slate-50"><p class="font-semibold">${p.title||'Imóvel'}</p><p class="text-sm">${p.address||''}</p></div>`).join('');
+    function renderDashboard() {
+      currentBroker && (currentBrokerName.textContent = `Olá, ${currentBroker.name.split(' ')[0]}!`);
+      shareLink.value = `${window.location.href.split('?')[0]}?brokerId=${currentBroker.id}`;
+      renderPropertiesList(properties.filter(p => p.brokerId === currentBroker.id));
+      renderAppointmentsList(appointments.filter(a => a.brokerId === currentBroker.id));
     }
 
-    function renderAppointmentsList(appts){
-      appointmentsList.innerHTML = appts.length===0 ? '<p class="text-slate-500">Nenhum agendamento.</p>' :
-        appts.map(a=>{
-          const d=new Date(`${a.date}T${a.time}`);
-          return `<div class="p-2 bg-blue-50 rounded"><p class="font-semibold">${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p><p class="text-xs">${a.clientName}</p></div>`;
-        }).join('');
+    function renderPropertiesList(list) {
+      propertiesList.innerHTML = list.length ? list.map(p => `<div class="p-3 border rounded bg-slate-50"><p class="font-semibold">${p.title}</p><p class="text-sm">${p.address}</p></div>`).join('') : '<p class="text-slate-500">Nenhum imóvel.</p>';
     }
 
-    async function handleNewProperty(){
-      showModal(`<h3 class="text-xl font-semibold mb-4">Novo Imóvel</h3>
-      <form id="propertyForm" class="space-y-3">
-        <input id="propTitle" placeholder="Título" required class="w-full p-2 border rounded">
-        <input id="propAddress" placeholder="Endereço" required class="w-full p-2 border rounded">
-        <input id="propPrice" placeholder="Preço" required class="w-full p-2 border rounded">
-        <textarea id="propDescription" placeholder="Descrição" class="w-full p-2 border rounded"></textarea>
-        <input type="file" id="propImage" accept="image/*" class="w-full text-sm">
-        <button class="px-3 py-2 bg-indigo-600 text-white rounded">Salvar</button>
-      </form>`);
-      propertyForm.addEventListener('submit',handlePropertyFormSubmit);
+    function renderAppointmentsList(list) {
+      appointmentsList.innerHTML = list.length ? list.map(a => `<div class="p-2 bg-blue-50 rounded"><p>${a.date} ${a.time}</p><p class="text-xs">${a.clientName}</p></div>`).join('') : '<p class="text-slate-500">Nenhum agendamento.</p>';
     }
 
-    async function handlePropertyFormSubmit(e){
-      e.preventDefault();
-      let imgUrl='';
-      const f=propImage.files[0];
-      if(f){ const fd=new FormData(); fd.append('image',f);
-        const r=await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,{method:'POST',body:fd});
-        const j=await r.json(); if(j.success) imgUrl=j.data.url;
+    function copyShareLink() { shareLink.select(); document.execCommand('copy'); showAlert('Link copiado!', 'success'); }
+    function openShareLink() { window.open(shareLink.value, '_blank'); }
+
+    // Cliente
+    async function showClientInterface(brokerId=null) {
+      showOnly('clientSection'); if (!brokers.length) await fetchData();
+      const props = brokerId ? properties.filter(p => p.brokerId === brokerId) : properties;
+      client-title.textContent = brokerId ? `Imóveis de ${brokers.find(b => b.id===brokerId)?.name}` : 'Propriedades disponíveis';
+      btn-back-to-login.classList.toggle('hidden', !!brokerId);
+      clientProperties.innerHTML = props.map(p => `
+        <div class="bg-white rounded shadow flex flex-col">
+          <img src="${p.imageUrl||'https://via.placeholder.com/400x250'}" class="w-full h-48 object-cover">
+          <div class="p-4 flex flex-col flex-grow">
+            <h3 class="font-semibold">${p.title}</h3>
+            <p class="text-sm text-slate-600">${p.address}</p>
+            <p class="font-bold">${p.price}</p>
+            <button data-id="${p.id}" data-broker="${p.brokerId}" class="schedule-btn mt-auto bg-green-600 text-white px-3 py-2 rounded">Agendar</button>
+          </div>
+        </div>`).join('');
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('schedule-btn')) {
+        const propId = e.target.dataset.id, brokerId = e.target.dataset.broker;
+        showModal(`<form id="apptForm" class="space-y-2">
+          <input type="hidden" id="apptPropId" value="${propId}">
+          <input type="hidden" id="apptBrokerId" value="${brokerId}">
+          <input id="apptClientName" placeholder="Seu nome" required class="w-full p-2 border rounded">
+          <input id="apptClientEmail" placeholder="Email" required class="w-full p-2 border rounded">
+          <input id="apptDate" type="date" required class="w-full p-2 border rounded">
+          <input id="apptTime" type="time" required class="w-full p-2 border rounded">
+          <button class="bg-green-600 text-white px-3 py-2 rounded">Confirmar</button>
+        </form>`);
+        document.getElementById('apptForm').addEventListener('submit', async ev => {
+          ev.preventDefault();
+          await postData({ id:`appt_${Date.now()}`,type:'appointment',brokerId,propertyId:propId,
+            clientName:apptClientName.value,clientEmail:apptClientEmail.value,date:apptDate.value,time:apptTime.value });
+          closeModal(); showAlert('Agendamento enviado!', 'success');
+        });
       }
-      const newProp={id:`prop_${Date.now()}`,type:'property',brokerId:currentBroker.id,
-        title:propTitle.value,address:propAddress.value,description:propDescription.value,price:propPrice.value,imageUrl:imgUrl};
-      await postData(newProp); closeModal(); await fetchData(); renderDashboard();
-    }
+    });
 
-    async function handleBlockTime(e){
-      e.preventDefault();
-      const slot={id:`appt_${Date.now()}`,type:'appointment',brokerId:currentBroker.id,
-        propertyId:'personal',clientName:'Horário Bloqueado',
-        date:blockDate.value,time:blockTime.value,details:blockReason.value};
-      await postData(slot); blockTimeForm.reset(); await fetchData(); renderDashboard();
-    }
+    // Listeners
+    loginForm.addEventListener('submit', handleLogin);
+    registerForm.addEventListener('submit', handleRegister);
+    btn-logout.addEventListener('click', handleLogout);
+    btn-copy-link.addEventListener('click', copyShareLink);
+    btn-open-link.addEventListener('click', openShareLink);
+    btn-show-client-interface.addEventListener('click', ()=>showClientInterface());
+    btn-back-to-login.addEventListener('click', ()=>showOnly('loginSection'));
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', e=>e.target.id==='modal'&&closeModal());
 
-    async function showClientInterface(brokerId=null){
-      showOnly('clientSection');
-      if(!properties.length) await fetchData();
-      let toShow=brokerId?properties.filter(p=>p.brokerId===brokerId):properties;
-      clientProperties.innerHTML = toShow.length===0 ? '<p>Nenhum imóvel.</p>' :
-        toShow.map(p=>`<div class="bg-white rounded shadow"><img src="${p.imageUrl||'https://via.placeholder.com/400x250'}" class="w-full h-40 object-cover"><div class="p-3"><h3 class="font-semibold">${p.title}</h3><p>${p.address}</p><p class="font-bold">${p.price}</p></div></div>`).join('');
-      if(brokerId){ btn-back-to-login.classList.add('hidden'); }
-    }
-
-    window.addEventListener('load',async()=>{
+    window.addEventListener('load', async () => {
       await fetchData();
-      loginForm.addEventListener('submit',handleLogin);
-      registerForm.addEventListener('submit',handleRegister);
-      btn-show-client-interface.addEventListener('click',()=>showClientInterface());
-      btn-back-to-login.addEventListener('click',()=>showOnly('loginSection'));
-      btn-logout.addEventListener('click',handleLogout);
-      btn-new-property.addEventListener('click',handleNewProperty);
-      blockTimeForm.addEventListener('submit',handleBlockTime);
-      btn-copy-link.addEventListener('click',copyShareLink);
-      btn-open-link.addEventListener('click',openShareLink);
-      modalClose.addEventListener('click',closeModal);
-      modal.addEventListener('click',e=>{if(e.target.id==='modal') closeModal();});
-      const brokerId=new URLSearchParams(location.search).get('brokerId');
-      if(brokerId) showClientInterface(brokerId); else showOnly('loginSection');
+      const brokerId = new URLSearchParams(window.location.search).get('brokerId');
+      brokerId ? showClientInterface(brokerId) : showOnly('loginSection');
     });
   </script>
 </body>
