@@ -107,8 +107,8 @@
   </div>
 
   <script>
-    const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet';
-    const imgbbApiKey = 'c9e158216e49f2c854478979da850aff';
+    const apiUrl = 'https://sheetdb.io/api/v1/fj1a7ud8yq7au';
+    const imgbbApiKey = 'bf74022f4b455b52504e55ef98d4c9f7';
     const scheduleConfig = { startTime: 9, endTime: 18, slotDuration: 60 };
     let currentBroker = null, properties = [], appointments = [], brokers = [];
 
@@ -127,7 +127,7 @@
         const alertEl = document.getElementById('loginSection').classList.contains('hidden') ? document.getElementById('alert-dashboard') : document.getElementById('alert-login');
         alertEl.textContent = message;
         alertEl.className = 'notification mb-4 p-3 rounded border ';
-        alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-800' : 'bg-red-100 border-red-400 text-red-700');
+        alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
         alertEl.classList.remove('hidden');
         setTimeout(() => alertEl.classList.add('hidden'), 5000);
     }
