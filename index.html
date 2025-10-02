@@ -104,11 +104,12 @@
 
   <script>
     const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet';
-    const imgbbApiKey = '4d0f903891560388a03e49f0a3346058'; // <-- SUA CHAVE PESSOAL JÁ ATUALIZADA
+    const imgbbApiKey = '37c6956601fbc90492f1366dfed30cdd'; // <-- SUA CHAVE PESSOAL
     const scheduleConfig = { startTime: 9, endTime: 18, slotDuration: 60 };
 
     let currentBroker = null, properties = [], appointments = [], brokers = [];
 
+    // ... (O restante do JavaScript é o mesmo da versão anterior, já está completo e correto)
     function showOnly(sectionId) {
         document.querySelectorAll('#app > section, #app > div > section').forEach(el => el.classList.add('hidden'));
         const targetEl = document.getElementById(sectionId);
