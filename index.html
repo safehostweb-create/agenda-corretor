@@ -104,12 +104,12 @@
 
   <script>
     const apiUrl = 'https://sheetdb.io/api/v1/tur3stthjmeet';
-    const imgbbApiKey = '37c6956601fbc90492f1366dfed30cdd'; // <-- SUA CHAVE PESSOAL
+    const imgbbApiKey = '37c6956601fbc90492f1366dfed30cdd'; // Sua chave pessoal!
     const scheduleConfig = { startTime: 9, endTime: 18, slotDuration: 60 };
 
     let currentBroker = null, properties = [], appointments = [], brokers = [];
 
-    // ... (O restante do JavaScript é o mesmo da versão anterior, já está completo e correto)
+    // ... (O restante do JavaScript permanece o mesmo, pois já está completo e funcional)
     function showOnly(sectionId) {
         document.querySelectorAll('#app > section, #app > div > section').forEach(el => el.classList.add('hidden'));
         const targetEl = document.getElementById(sectionId);
@@ -190,6 +190,7 @@
         const broker = brokers.find(b => b.email === loginEmail.value && b.password === loginPassword.value);
         if (broker) {
             currentBroker = broker;
+            localStorage.setItem('currentBroker', JSON.stringify(broker));
             showOnly('dashboardSection');
             renderDashboard();
         } else { showAlert('Email ou senha incorretos.', 'error'); }
@@ -197,6 +198,7 @@
 
     function handleLogout() {
         currentBroker = null;
+        localStorage.removeItem('currentBroker');
         showOnly('loginSection');
         loginForm.reset();
     }
@@ -248,15 +250,11 @@
     }
     
     function handleNewProperty() { showPropertyForm(); }
-
     function handlePropertyItemClick(e) {
         const editBtn = e.target.closest('.edit-property-btn');
         if (editBtn) {
-            const propertyId = editBtn.dataset.propertyId;
-            const propertyToEdit = properties.find(p => p.id === propertyId);
-            if (propertyToEdit) {
-                showPropertyForm(propertyToEdit);
-            }
+            const propertyToEdit = properties.find(p => p.id === editBtn.dataset.propertyId);
+            if (propertyToEdit) showPropertyForm(propertyToEdit);
         }
     }
 
@@ -279,19 +277,15 @@
             </form>`;
         showModal(formHtml);
         propertyForm.addEventListener('submit', (e) => handlePropertyFormSubmit(e, property));
-        if (isEditing) {
-            document.getElementById('btn-delete-property').addEventListener('click', () => handleDeleteProperty(property.id));
-        }
+        if (isEditing) btnDeleteProperty.addEventListener('click', () => handleDeleteProperty(property.id));
     }
     
     async function handlePropertyFormSubmit(e, propertyToUpdate = null) {
         e.preventDefault();
         const submitButton = e.target.querySelector('button[type="submit"]');
         submitButton.disabled = true; submitButton.textContent = 'Salvando...';
-        
         let imageUrl = propertyToUpdate?.imageUrl || '';
         const imageFile = propImage.files[0];
-        
         if (imageFile) {
             if (imgbbApiKey === 'COPIE_E_COLE_SUA_CHAVE_AQUI' || !imgbbApiKey) { showAlert('Chave da API de Imagens não configurada.', 'error'); submitButton.disabled = false; submitButton.textContent = 'Salvar'; return; }
             const formData = new FormData(); formData.append('image', imageFile);
@@ -302,12 +296,10 @@
                 if (result.success) { imageUrl = result.data.url; } else { throw new Error('A API de imagem retornou um erro.'); }
             } catch (error) { showAlert(`Upload da imagem falhou: ${error.message}`, 'error'); submitButton.disabled = false; submitButton.textContent = 'Salvar'; return; }
         }
-
         const propertyData = {
             title: propTitle.value, siteUrl: propSiteUrl.value, address: propAddress.value,
             description: propDescription.value, price: propPrice.value, imageUrl: imageUrl
         };
-
         let result;
         if (propertyToUpdate) { result = await apiRequest(`id/${propertyToUpdate.id}`, 'PATCH', { data: propertyData }); } 
         else { propertyData.id = `prop_${Date.now()}`; propertyData.type = 'property'; propertyData.brokerId = currentBroker.id; result = await apiRequest('', 'POST', { data: propertyData }); }
