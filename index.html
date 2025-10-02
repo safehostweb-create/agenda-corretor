@@ -133,23 +133,18 @@
       }
     }
 
-    // ----- CORRIGIDO: Função de Alerta -----
     function showAlert(message, type = 'success') {
-        // Decide qual container de alerta usar dependendo da tela visível
         const alertEl = document.getElementById('loginSection').classList.contains('hidden') 
             ? document.getElementById('alert-dashboard') 
             : document.getElementById('alert-login');
-
         alertEl.textContent = message;
-        // Reseta as classes de cor
+        alertEl.className = 'notification mb-4 p-3 rounded border ';
         alertEl.classList.remove('bg-green-100', 'border-green-400', 'text-green-700', 'bg-red-100', 'border-red-400', 'text-red-700');
-
         if (type === 'success') {
             alertEl.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
-        } else { // 'error'
+        } else {
             alertEl.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
         }
-
         alertEl.classList.remove('hidden');
         setTimeout(() => alertEl.classList.add('hidden'), 4000);
     }
@@ -203,6 +198,7 @@
         }
     }
 
+    // ----- ATUALIZADO: Salva o login -----
     async function handleLogin(e) {
         e.preventDefault();
         await fetchData();
@@ -211,13 +207,16 @@
         const broker = brokers.find(b => b.email === email && b.password === pass);
         if (broker) {
             currentBroker = broker;
+            localStorage.setItem('currentBroker', JSON.stringify(broker)); // Salva o corretor no localStorage
             showOnly('dashboardSection');
             renderDashboard();
         } else { showAlert('Email ou senha incorretos.', 'error'); }
     }
 
+    // ----- ATUALIZADO: Limpa o login salvo -----
     function handleLogout() {
         currentBroker = null;
+        localStorage.removeItem('currentBroker'); // Remove o corretor do localStorage
         showOnly('loginSection');
         document.getElementById('loginForm').reset();
     }
@@ -421,11 +420,13 @@
         if (currentBroker) { await fetchData(); renderDashboard(); }
     }
 
+    // ----- ATUALIZADO: Lógica de Carregamento da Página com Login Salvo -----
     window.addEventListener('load', async () => {
         const safeOn = (id, event, fn) => {
             const el = document.getElementById(id);
             if (el) el.addEventListener(event, fn);
         };
+        
         safeOn('loginForm', 'submit', handleLogin);
         safeOn('registerForm', 'submit', handleRegister);
         safeOn('btn-show-client-interface', 'click', () => showClientInterface());
@@ -438,11 +439,22 @@
         safeOn('modal', 'click', (e) => e.target.id === 'modal' && closeModal());
         document.getElementById('clientProperties').addEventListener('click', handleScheduleVisitClick);
         document.getElementById('appointmentsList').addEventListener('click', handleAppointmentClick);
+        
         const urlParams = new URLSearchParams(window.location.search);
         const specificBrokerId = urlParams.get('brokerId');
+        const savedBrokerJSON = localStorage.getItem('currentBroker');
+
         await fetchData();
-        if (specificBrokerId) { showClientInterface(specificBrokerId); } 
-        else { showOnly('loginSection'); }
+
+        if (savedBrokerJSON) {
+            currentBroker = JSON.parse(savedBrokerJSON);
+            showOnly('dashboardSection');
+            renderDashboard();
+        } else if (specificBrokerId) {
+            showClientInterface(specificBrokerId);
+        } else {
+            showOnly('loginSection');
+        }
     });
   </script>
 </body>
