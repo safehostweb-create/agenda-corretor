@@ -198,7 +198,6 @@
         }
     }
 
-    // ----- ATUALIZADO: Salva o login -----
     async function handleLogin(e) {
         e.preventDefault();
         await fetchData();
@@ -207,16 +206,13 @@
         const broker = brokers.find(b => b.email === email && b.password === pass);
         if (broker) {
             currentBroker = broker;
-            localStorage.setItem('currentBroker', JSON.stringify(broker)); // Salva o corretor no localStorage
             showOnly('dashboardSection');
             renderDashboard();
         } else { showAlert('Email ou senha incorretos.', 'error'); }
     }
 
-    // ----- ATUALIZADO: Limpa o login salvo -----
     function handleLogout() {
         currentBroker = null;
-        localStorage.removeItem('currentBroker'); // Remove o corretor do localStorage
         showOnly('loginSection');
         document.getElementById('loginForm').reset();
     }
@@ -279,12 +275,25 @@
         showModal(modalHtml);
     }
     
+    // ----- ATUALIZADO: Formulário de Imóvel com campo para Site -----
     function handleNewProperty() {
-        const formHtml = `<h3 class="text-xl font-semibold mb-4">Cadastrar Imóvel</h3><form id="propertyForm" class="space-y-3"><input type="text" id="propTitle" placeholder="Título do Imóvel" required class="w-full p-2 border rounded"><input type="text" id="propAddress" placeholder="Endereço" required class="w-full p-2 border rounded"><textarea id="propDescription" placeholder="Descrição" class="w-full p-2 border rounded"></textarea><input type="text" id="propPrice" placeholder="Preço" required class="w-full p-2 border rounded"><label class="block text-sm font-medium text-slate-700">Foto</label><input type="file" id="propImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"><div class="text-right"><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Salvar</button></div></form>`;
+        const formHtml = `
+            <h3 class="text-xl font-semibold mb-4">Cadastrar Novo Imóvel</h3>
+            <form id="propertyForm" class="space-y-3">
+                <input type="text" id="propTitle" placeholder="Título do Imóvel" required class="w-full p-2 border rounded">
+                <input type="url" id="propSiteUrl" placeholder="Site do Empreendimento (Opcional)" class="w-full p-2 border rounded">
+                <input type="text" id="propAddress" placeholder="Endereço" required class="w-full p-2 border rounded">
+                <textarea id="propDescription" placeholder="Descrição" class="w-full p-2 border rounded"></textarea>
+                <input type="text" id="propPrice" placeholder="Preço" required class="w-full p-2 border rounded">
+                <label class="block text-sm font-medium text-slate-700">Foto de Capa</label>
+                <input type="file" id="propImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                <div class="text-right"><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Salvar</button></div>
+            </form>`;
         showModal(formHtml);
         document.getElementById('propertyForm').addEventListener('submit', handlePropertyFormSubmit);
     }
 
+    // ----- ATUALIZADO: Salva o novo campo 'siteUrl' -----
     async function handlePropertyFormSubmit(e) {
         e.preventDefault();
         const submitButton = e.target.querySelector('button[type="submit"]');
@@ -300,9 +309,13 @@
             } catch (error) { showAlert('Upload da imagem falhou.', 'error'); submitButton.disabled = false; submitButton.textContent = 'Salvar'; return; }
         }
         const newProperty = {
-            id: `prop_${Date.now()}`, type: 'property', brokerId: currentBroker.id, title: document.getElementById('propTitle').value,
-            address: document.getElementById('propAddress').value, description: document.getElementById('propDescription').value,
-            price: document.getElementById('propPrice').value, imageUrl: imageUrl,
+            id: `prop_${Date.now()}`, type: 'property', brokerId: currentBroker.id,
+            title: document.getElementById('propTitle').value,
+            siteUrl: document.getElementById('propSiteUrl').value, // NOVO CAMPO
+            address: document.getElementById('propAddress').value,
+            description: document.getElementById('propDescription').value,
+            price: document.getElementById('propPrice').value,
+            imageUrl: imageUrl,
         };
         await postData(newProperty);
         showAlert('Imóvel cadastrado!', 'success');
@@ -333,12 +346,34 @@
         renderClientProperties(propertiesToShow);
     }
     
+    // ----- ATUALIZADO: Renderiza o botão "Ver Site Oficial" na vitrine -----
     function renderClientProperties(propertiesToShow) {
         const listEl = document.getElementById('clientProperties');
         if (propertiesToShow.length === 0) { listEl.innerHTML = '<p class="col-span-3 text-center text-slate-500">Nenhum imóvel disponível.</p>'; return; }
         listEl.innerHTML = propertiesToShow.map(prop => {
             const broker = brokers.find(b => b.id === prop.brokerId);
-            return `<div class="bg-white rounded-lg shadow overflow-hidden flex flex-col"><img src="${prop.imageUrl || 'https://via.placeholder.com/400x250.png?text=Sem+Foto'}" alt="${prop.title}" class="w-full h-48 object-cover"><div class="p-4 flex flex-col flex-grow"><h3 class="font-semibold text-lg">${prop.title}</h3><p class="text-slate-600 text-sm mb-2">${prop.address}</p><p class="text-slate-800 font-bold mb-3">${prop.price}</p><p class="text-sm text-slate-500 mb-4 flex-grow">${prop.description ? prop.description.substring(0, 100) + '...' : ''}</p><div class="text-xs bg-gray-100 p-2 rounded mb-4"><p><strong>Corretor:</strong> ${broker ? broker.name : 'N/A'}</p><p><strong>Contato:</strong> ${broker ? broker.phone : 'N/A'}</p></div><button data-property-id="${prop.id}" data-broker-id="${prop.brokerId}" class="schedule-visit-btn mt-auto w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700">Agendar Visita</button></div></div>`;
+            const siteButton = prop.siteUrl 
+                ? `<a href="${prop.siteUrl}" target="_blank" rel="noopener noreferrer" class="mt-2 text-center w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-semibold">Ver Site Oficial</a>`
+                : '';
+
+            return `
+                <div class="bg-white rounded-lg shadow overflow-hidden flex flex-col">
+                    <img src="${prop.imageUrl || 'https://via.placeholder.com/400x250.png?text=Sem+Foto'}" alt="${prop.title}" class="w-full h-48 object-cover">
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-lg">${prop.title}</h3>
+                        <p class="text-slate-600 text-sm mb-2">${prop.address}</p>
+                        <p class="text-slate-800 font-bold mb-3">${prop.price}</p>
+                        <p class="text-sm text-slate-500 mb-4 flex-grow">${prop.description ? prop.description.substring(0, 100) + '...' : ''}</p>
+                        <div class="text-xs bg-gray-100 p-2 rounded mb-4">
+                            <p><strong>Corretor:</strong> ${broker ? broker.name : 'N/A'}</p>
+                            <p><strong>Contato:</strong> ${broker ? broker.phone : 'N/A'}</p>
+                        </div>
+                        <div class="mt-auto flex flex-col gap-2">
+                           ${siteButton}
+                           <button data-property-id="${prop.id}" data-broker-id="${prop.brokerId}" class="schedule-visit-btn w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold">Agendar Visita</button>
+                        </div>
+                    </div>
+                </div>`;
         }).join('');
     }
 
@@ -420,13 +455,11 @@
         if (currentBroker) { await fetchData(); renderDashboard(); }
     }
 
-    // ----- ATUALIZADO: Lógica de Carregamento da Página com Login Salvo -----
     window.addEventListener('load', async () => {
         const safeOn = (id, event, fn) => {
             const el = document.getElementById(id);
             if (el) el.addEventListener(event, fn);
         };
-        
         safeOn('loginForm', 'submit', handleLogin);
         safeOn('registerForm', 'submit', handleRegister);
         safeOn('btn-show-client-interface', 'click', () => showClientInterface());
@@ -439,22 +472,11 @@
         safeOn('modal', 'click', (e) => e.target.id === 'modal' && closeModal());
         document.getElementById('clientProperties').addEventListener('click', handleScheduleVisitClick);
         document.getElementById('appointmentsList').addEventListener('click', handleAppointmentClick);
-        
         const urlParams = new URLSearchParams(window.location.search);
         const specificBrokerId = urlParams.get('brokerId');
-        const savedBrokerJSON = localStorage.getItem('currentBroker');
-
         await fetchData();
-
-        if (savedBrokerJSON) {
-            currentBroker = JSON.parse(savedBrokerJSON);
-            showOnly('dashboardSection');
-            renderDashboard();
-        } else if (specificBrokerId) {
-            showClientInterface(specificBrokerId);
-        } else {
-            showOnly('loginSection');
-        }
+        if (specificBrokerId) { showClientInterface(specificBrokerId); } 
+        else { showOnly('loginSection'); }
     });
   </script>
 </body>
