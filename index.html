@@ -26,6 +26,8 @@
             </button>
         </header>
         
+        <div id="alert-login" class="hidden notification mb-4 p-3 rounded border"></div>
+
         <div class="grid md:grid-cols-2 gap-8">
             <div class="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800">
                 <h2 class="text-2xl font-semibold text-white mb-5 text-center">Login do Corretor</h2>
@@ -50,7 +52,7 @@
     </section>
 
     <div class="w-full max-w-5xl mt-10">
-        <div id="alert" class="hidden notification mb-4 p-3 rounded border"></div>
+        <div id="alert-dashboard" class="hidden notification mb-4 p-3 rounded border"></div>
         <section id="dashboardSection" class="hidden bg-white/95 rounded-2xl shadow-lg p-6">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Painel</h2>
@@ -131,11 +133,23 @@
       }
     }
 
+    // ----- CORRIGIDO: Função de Alerta -----
     function showAlert(message, type = 'success') {
-        const alertEl = document.getElementById('alert');
+        // Decide qual container de alerta usar dependendo da tela visível
+        const alertEl = document.getElementById('loginSection').classList.contains('hidden') 
+            ? document.getElementById('alert-dashboard') 
+            : document.getElementById('alert-login');
+
         alertEl.textContent = message;
-        alertEl.className = 'notification mb-4 p-3 rounded border ';
-        alertEl.classList.add(type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700');
+        // Reseta as classes de cor
+        alertEl.classList.remove('bg-green-100', 'border-green-400', 'text-green-700', 'bg-red-100', 'border-red-400', 'text-red-700');
+
+        if (type === 'success') {
+            alertEl.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+        } else { // 'error'
+            alertEl.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+        }
+
         alertEl.classList.remove('hidden');
         setTimeout(() => alertEl.classList.add('hidden'), 4000);
     }
@@ -171,13 +185,9 @@
         } catch (error) { console.error("postData Error:", error); showAlert('Ocorreu um erro ao salvar.', 'error'); }
     }
 
-    // ----- CORRIGIDO: Função de Registro -----
     async function handleRegister(e) {
         e.preventDefault();
-        
-        // Garante que a lista de corretores está atualizada ANTES de checar por duplicatas
         await fetchData(); 
-
         const newBroker = {
             id: `broker_${Date.now()}`, type: 'broker', name: document.getElementById('regName').value,
             email: document.getElementById('regEmail').value, phone: document.getElementById('regPhone').value,
@@ -185,17 +195,17 @@
         };
         if (!newBroker.name || !newBroker.email || !newBroker.password) return showAlert('Nome, email e senha são obrigatórios.', 'error');
         if (brokers.find(b => b.email === newBroker.email)) return showAlert('Este email já está cadastrado.', 'error');
-        
         const result = await postData(newBroker);
         if (result && result.created) {
             showAlert('Cadastro realizado com sucesso! Faça o login.', 'success');
             document.getElementById('registerForm').reset();
-            await fetchData(); // Atualiza a lista novamente após o cadastro
+            await fetchData();
         }
     }
 
     async function handleLogin(e) {
         e.preventDefault();
+        await fetchData();
         const email = document.getElementById('loginEmail').value;
         const pass = document.getElementById('loginPassword').value;
         const broker = brokers.find(b => b.email === email && b.password === pass);
