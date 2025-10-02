@@ -1,86 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agenda do Corretor - Versão Premium</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.notification { animation: slideIn 0.25s ease-out; }
+@keyframes slideIn { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.dark-input::placeholder { color: #a1a1aa; }
+</style>
+</head>
+<body class="bg-black text-gray-300">
+<div id="app" class="min-h-screen flex flex-col items-center p-4 sm:p-6">
+
+<section id="loginSection" class="w-full max-w-4xl mt-10">
+  <header class="flex justify-between items-center mb-10 px-2">
+    <h1 class="text-3xl font-bold text-white tracking-wide">Agenda do Corretor</h1>
+    <button id="btn-show-client-interface" type="button" class="px-5 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-md flex-shrink-0">
+      Acesso Cliente
+    </button>
+  </header>
+
+  <div id="alert-login" class="hidden notification mb-4 p-3 rounded border"></div>
+
+  <div class="grid md:grid-cols-2 gap-8">
+    <div class="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800">
+      <h2 class="text-2xl font-semibold text-white mb-5 text-center">Login do Corretor</h2>
+      <form id="loginForm" class="space-y-4">
+        <input id="loginEmail" type="email" required placeholder="Email" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
+        <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
+        <button class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">Entrar</button>
+      </form>
+    </div>
+
+    <div class="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800">
+      <h2 class="text-2xl font-semibold text-white mb-5 text-center">Ainda não tem conta?</h2>
+      <form id="registerForm" class="space-y-4">
+        <input id="regName" type="text" required placeholder="Nome Completo" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+        <input id="regCreci" type="text" required placeholder="CRECI (somente números)" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+        <input id="regEmail" type="email" required placeholder="Email" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+        <input id="regPhone" type="text" placeholder="Telefone" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+        <input id="regPassword" type="password" required placeholder="Crie uma Senha" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
+        <button class="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">Criar Conta</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="w-full max-w-5xl mt-10">
+  <div id="alert-dashboard" class="hidden notification mb-4 p-3 rounded border"></div>
+
+  <section id="dashboardSection" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-semibold text-white">Painel</h2>
+      <div class="flex items-center gap-4">
+        <span id="currentBrokerName" class="text-gray-400"></span>
+        <button id="btn-logout" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700">Sair</button>
+      </div>
+    </div>
+
+    <div id="shareLinkContainer" class="mb-6 p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
+      <label for="shareLink" class="block text-sm font-medium text-gray-300">Seu Link de Divulgação Exclusivo:</label>
+      <div class="flex items-center gap-2 mt-2">
+        <input type="text" id="shareLink" readonly class="w-full p-2 border border-neutral-600 bg-neutral-900 rounded-md text-sm text-gray-300">
+        <button id="btn-copy-link" class="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-700">Copiar</button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <div class="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-white">Meus Imóveis</h3>
+          <button id="btn-new-property" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">Novo imóvel</button>
+        </div>
+        <div id="propertiesList" class="space-y-3"></div>
+      </div>
+
+      <div class="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-white">Minha Agenda</h3>
+        </div>
+        <div id="appointmentsList" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm"></div>
+        <hr class="my-6 border-neutral-700" />
+        <h4 class="font-semibold text-white mb-3">Bloquear horário pessoal</h4>
+        <form id="blockTimeForm" class="grid sm:grid-cols-2 gap-4 items-end">
+          <input id="blockDate" type="date" required class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg" />
+          <input id="blockTime" type="time" required class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg" />
+          <input id="blockReason" type="text" placeholder="Motivo (opcional)" class="w-full sm:col-span-2 p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg dark-input" />
+          <button class="w-full sm:col-span-2 px-4 py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-600">Bloquear</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="clientSection" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="client-title" class="text-2xl font-semibold text-white">Propriedades disponíveis</h2>
+      <button id="btn-back-to-login" class="px-4 py-2 bg-neutral-700 text-white text-sm font-semibold rounded-lg hover:bg-neutral-600">Voltar</button>
+    </div>
+    <div id="clientProperties" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+</div>
+
+<div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/80 p-4 z-50">
+  <div class="bg-neutral-900 border border-neutral-700 rounded-lg shadow-lg p-6 w-full max-w-lg">
+    <div id="modalContent"></div>
+    <div class="mt-6 text-right">
+      <button id="modalClose" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const apiUrl = 'https://sheetdb.io/api/v1/f581ql5gbuc71'; 
-const imgbbApiKey = 'c9e158216e49f2c854478979da850aff';
-const scheduleConfig = { startTime: 9, endTime: 18, slotDuration: 60 };
+const apiBase = "https://sheetdb.io/api/v1/f581ql5gbuc71";
+const imgbbApiKey = "c9e158216e49f2c854478979da850aff";
 let currentBroker = null;
 
-// utilitário: alertas bonitinhos
-function showAlert(id, message, type = "success") {
-  const el = document.getElementById(id);
-  el.textContent = message;
-  el.className = `notification mb-4 p-3 rounded border ${
-    type === "error" ? "bg-red-600/30 border-red-500 text-red-200" :
-    type === "success" ? "bg-green-600/30 border-green-500 text-green-200" :
-    "bg-yellow-600/30 border-yellow-500 text-yellow-200"
-  }`;
+// alert
+function showAlert(id, msg, type="success"){
+  const el=document.getElementById(id);
+  el.textContent=msg;
+  el.className=`notification mb-4 p-3 rounded border ${type==="error"?"bg-red-600/30 border-red-500 text-red-200":"bg-green-600/30 border-green-500 text-green-200"}`;
   el.classList.remove("hidden");
-  setTimeout(() => el.classList.add("hidden"), 4000);
+  setTimeout(()=>el.classList.add("hidden"),4000);
 }
 
-// trocar seções
-function showSection(id) {
-  ["loginSection","dashboardSection","clientSection"].forEach(sec=>{
-    document.getElementById(sec).classList.add("hidden");
-  });
+function showSection(id){
+  ["loginSection","dashboardSection","clientSection"].forEach(sec=>document.getElementById(sec).classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
-// ====================== REGISTRO ======================
-document.getElementById("registerForm").addEventListener("submit", async e=>{
+// Registro
+registerForm.addEventListener("submit", async e=>{
   e.preventDefault();
-  const newBroker = {
-    name: document.getElementById("regName").value,
-    creci: document.getElementById("regCreci").value,
-    email: document.getElementById("regEmail").value,
-    phone: document.getElementById("regPhone").value,
-    password: document.getElementById("regPassword").value
-  };
-
-  try {
-    await fetch(apiUrl, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ data: [newBroker] })
-    });
-    showAlert("alert-login","Conta criada com sucesso! Faça login.","success");
-    e.target.reset();
-  } catch(err){
-    showAlert("alert-login","Erro ao registrar.","error");
-  }
+  const novo={type:"corretor",name:regName.value,email:regEmail.value,password:regPassword.value,phone:regPhone.value,creci:regCreci.value};
+  await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[novo]})});
+  showAlert("alert-login","Conta criada com sucesso!","success");
+  e.target.reset();
 });
 
-// ====================== LOGIN ======================
-document.getElementById("loginForm").addEventListener("submit", async e=>{
+// Login
+loginForm.addEventListener("submit", async e=>{
   e.preventDefault();
-  const email = document.getElementById("loginEmail").value;
-  const pass = document.getElementById("loginPassword").value;
-
-  try {
-    const res = await fetch(`${apiUrl}/search?email=${email}&password=${pass}`);
-    const data = await res.json();
-    if(data.length){
-      currentBroker = data[0];
-      document.getElementById("currentBrokerName").textContent = currentBroker.name;
-      document.getElementById("shareLink").value = window.location.origin + "?broker=" + currentBroker.email;
-      showSection("dashboardSection");
-    } else {
-      showAlert("alert-login","Credenciais inválidas.","error");
-    }
-  } catch(err){
-    showAlert("alert-login","Erro ao logar.","error");
-  }
+  const email=loginEmail.value, pass=loginPassword.value;
+  const res=await fetch(`${apiBase}/search?type=corretor&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+  const data=await res.json();
+  if(data.length){
+    currentBroker=data[0];
+    document.getElementById("currentBrokerName").textContent=currentBroker.name;
+    document.getElementById("shareLink").value=window.location.origin+"?broker="+encodeURIComponent(currentBroker.email);
+    showSection("dashboardSection");
+    loadProperties();
+    loadAppointments();
+  }else showAlert("alert-login","Credenciais inválidas","error");
 });
 
-// ====================== LOGOUT ======================
-document.getElementById("btn-logout").addEventListener("click",()=>{
-  currentBroker = null;
-  showSection("loginSection");
-});
+// Logout
+btn-logout.onclick=()=>{ currentBroker=null; showSection("loginSection"); };
 
-// ====================== IMÓVEIS ======================
-document.getElementById("btn-new-property").addEventListener("click", ()=>{
-  const modal = document.getElementById("modal");
-  document.getElementById("modalContent").innerHTML = `
+// Novo imóvel
+btn-new-property.onclick=()=>{
+  modal.classList.remove("hidden");
+  modalContent.innerHTML=`
     <h3 class="text-xl text-white mb-3">Novo Imóvel</h3>
     <form id="newPropertyForm" class="space-y-3">
       <input type="text" id="propTitle" required placeholder="Título" class="w-full p-2 bg-neutral-800 text-white rounded"/>
@@ -89,98 +172,71 @@ document.getElementById("btn-new-property").addEventListener("click", ()=>{
       <button class="w-full bg-blue-600 text-white rounded p-2">Salvar</button>
     </form>
   `;
-  modal.classList.remove("hidden","opacity-0");
-  
-  document.getElementById("newPropertyForm").addEventListener("submit", async ev=>{
+  newPropertyForm.onsubmit=async ev=>{
     ev.preventDefault();
-    const file = document.getElementById("propImage").files[0];
-    let imageUrl = "";
-
-    // upload no imgbb
-    const fd = new FormData();
-    fd.append("image", file);
-    const upload = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
-      method:"POST", body: fd
-    });
-    const upRes = await upload.json();
-    imageUrl = upRes.data.url;
-
-    const property = {
-      broker: currentBroker.email,
-      title: document.getElementById("propTitle").value,
-      description: document.getElementById("propDesc").value,
-      image: imageUrl
-    };
-
-    await fetch(apiUrl,{
-      method:"POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ data:[property] })
-    });
-
+    const file=propImage.files[0];
+    const fd=new FormData();
+    fd.append("image",file);
+    const upload=await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,{method:"POST",body:fd});
+    const upRes=await upload.json();
+    const obj={type:"imovel",title:propTitle.value,description:propDesc.value,imageUrl:upRes.data.url,owner:currentBroker.email};
+    await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[obj]})});
     loadProperties();
     modal.classList.add("hidden");
-  });
-});
+  };
+};
+modalClose.onclick=()=> modal.classList.add("hidden");
 
-document.getElementById("modalClose").addEventListener("click",()=>{
-  document.getElementById("modal").classList.add("hidden");
-});
-
+// Carregar imóveis
 async function loadProperties(){
-  const res = await fetch(`${apiUrl}/search?broker=${currentBroker.email}`);
-  const data = await res.json();
-  const list = document.getElementById("propertiesList");
-  list.innerHTML = "";
+  if(!currentBroker) return;
+  const res=await fetch(`${apiBase}/search?type=imovel&owner=${encodeURIComponent(currentBroker.email)}`);
+  const data=await res.json();
+  propertiesList.innerHTML="";
   data.forEach(prop=>{
-    const div = document.createElement("div");
-    div.className="p-3 border border-neutral-700 rounded bg-neutral-800";
-    div.innerHTML = `
-      <h4 class="font-semibold text-white">${prop.title}</h4>
-      <img src="${prop.image}" class="w-full h-32 object-cover rounded my-2"/>
-      <p class="text-sm text-gray-300">${prop.description||""}</p>
-    `;
-    list.appendChild(div);
+    propertiesList.innerHTML+=`<div class="p-3 border border-neutral-700 rounded bg-neutral-800"><h4 class="font-semibold text-white">${prop.title}</h4><img src="${prop.imageUrl}" class="w-full h-32 object-cover rounded my-2"/><p class="text-sm text-gray-300">${prop.description||""}</p></div>`;
   });
 }
 
-// ====================== AGENDA ======================
-document.getElementById("blockTimeForm").addEventListener("submit", async e=>{
+// Bloquear horário
+blockTimeForm.onsubmit=async e=>{
   e.preventDefault();
-  const block = {
-    broker: currentBroker.email,
-    date: document.getElementById("blockDate").value,
-    time: document.getElementById("blockTime").value,
-    reason: document.getElementById("blockReason").value
-  };
-  await fetch(apiUrl,{ method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({data:[block]}) });
-  showAlert("alert-dashboard","Horário bloqueado com sucesso.","success");
-});
+  if(!currentBroker) return;
+  const obj={type:"agenda",owner:currentBroker.email,date:blockDate.value,time:blockTime.value,reason:blockReason.value||""};
+  await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[obj]})});
+  loadAppointments();
+  e.target.reset();
+};
 
-// ====================== CLIENTE ======================
-document.getElementById("btn-show-client-interface").addEventListener("click", ()=>{
+// Carregar agenda
+async function loadAppointments(){
+  if(!currentBroker) return;
+  const res=await fetch(`${apiBase}/search?type=agenda&owner=${encodeURIComponent(currentBroker.email)}`);
+  const data=await res.json();
+  appointmentsList.innerHTML="";
+  data.forEach(app=>{
+    appointmentsList.innerHTML+=`<div class="p-2 border border-neutral-700 rounded bg-neutral-800 text-white text-sm">${app.date} ${app.time} ${app.reason? "- "+app.reason : ""}</div>`;
+  });
+}
+
+// Cliente
+btn-show-client-interface.onclick=()=>{
   showSection("clientSection");
   loadClientProperties();
-});
-
-document.getElementById("btn-back-to-login").addEventListener("click", ()=>{
-  showSection("loginSection");
-});
+};
+btn-back-to-login.onclick=()=> showSection("loginSection");
 
 async function loadClientProperties(){
-  const res = await fetch(apiUrl);
-  const data = await res.json();
-  const list = document.getElementById("clientProperties");
-  list.innerHTML="";
-  data.filter(d=>d.title).forEach(prop=>{
-    const div = document.createElement("div");
-    div.className="border border-neutral-700 rounded bg-neutral-800 p-3";
-    div.innerHTML=`
-      <h4 class="text-white font-semibold">${prop.title}</h4>
-      <img src="${prop.image}" class="w-full h-32 object-cover rounded my-2"/>
-      <p class="text-sm text-gray-400">${prop.description||""}</p>
-    `;
-    list.appendChild(div);
+  const res=await fetch(`${apiBase}/search?type=imovel`);
+  const data=await res.json();
+  clientProperties.innerHTML="";
+  data.forEach(prop=>{
+    clientProperties.innerHTML+=`<div class="p-3 border border-neutral-700 rounded bg-neutral-800"><h4 class="font-semibold text-white">${prop.title}</h4><img src="${prop.imageUrl}" class="w-full h-32 object-cover rounded my-2"/><p class="text-sm text-gray-300">${prop.description||""}</p></div>`;
   });
 }
+
+// Copiar link
+btn-copy-link.onclick=()=>{ shareLink.select(); navigator.clipboard.writeText(shareLink.value); showAlert("alert-dashboard","Link copiado!"); };
 </script>
+</body>
+</html>
