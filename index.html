@@ -1,242 +1,193 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Agenda do Corretor - Versão Premium</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Corretor</title>
 <style>
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-.notification { animation: slideIn 0.25s ease-out; }
-@keyframes slideIn { from { transform: translateY(10px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-.dark-input::placeholder { color: #a1a1aa; }
+  /* Reset básico */
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+  body { background-color: #121212; color: #fff; padding: 20px; min-height: 100vh; }
+
+  h1, h2 { text-align: center; margin-bottom: 20px; }
+
+  /* Login */
+  .login-box {
+    max-width: 400px;
+    margin: 50px auto;
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+  }
+  .login-box input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: none;
+    background-color: #2c2c2c;
+    color: #fff;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff3399;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .login-box button:hover { background-color: #ff66b3; }
+
+  /* Painel */
+  #panelDiv { display: none; }
+  .welcome { text-align: center; margin-bottom: 20px; color: #ff66b3; font-size: 1.2em; }
+
+  /* Form de adição */
+  .form-container {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .form-container input, .form-container button {
+    flex: 1 1 150px;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+  }
+  .form-container input { background-color: #2c2c2c; color: #fff; }
+  .form-container button { background-color: #ff3399; color: #fff; font-weight: bold; cursor: pointer; transition: 0.3s; }
+  .form-container button:hover { background-color: #ff66b3; }
+
+  /* Cards de agendamento */
+  .cards-container {
+    max-width: 900px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #ff3399;
+    transition: 0.3s;
+  }
+  .card:hover { border-color: #ff66b3; transform: translateY(-5px); }
+  .card h3 { color: #ff66b3; margin-bottom: 10px; }
+  .card p { margin: 5px 0; }
+
 </style>
 </head>
-<body class="bg-black text-gray-300">
-<div id="app" class="min-h-screen flex flex-col items-center p-4 sm:p-6">
+<body>
 
-<section id="loginSection" class="w-full max-w-4xl mt-10">
-  <header class="flex justify-between items-center mb-10 px-2">
-    <h1 class="text-3xl font-bold text-white tracking-wide">Agenda do Corretor</h1>
-    <button id="btn-show-client-interface" type="button" class="px-5 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-md flex-shrink-0">
-      Acesso Cliente
-    </button>
-  </header>
-
-  <div id="alert-login" class="hidden notification mb-4 p-3 rounded border"></div>
-
-  <div class="grid md:grid-cols-2 gap-8">
-    <div class="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800">
-      <h2 class="text-2xl font-semibold text-white mb-5 text-center">Login do Corretor</h2>
-      <form id="loginForm" class="space-y-4">
-        <input id="loginEmail" type="email" required placeholder="Email" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
-        <input id="loginPassword" type="password" required placeholder="Senha" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-blue-500 dark-input" />
-        <button class="w-full px-4 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">Entrar</button>
-      </form>
-    </div>
-
-    <div class="bg-neutral-900 p-8 rounded-xl shadow-lg border border-neutral-800">
-      <h2 class="text-2xl font-semibold text-white mb-5 text-center">Ainda não tem conta?</h2>
-      <form id="registerForm" class="space-y-4">
-        <input id="regName" type="text" required placeholder="Nome Completo" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
-        <input id="regCreci" type="text" required placeholder="CRECI (somente números)" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
-        <input id="regEmail" type="email" required placeholder="Email" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
-        <input id="regPhone" type="text" placeholder="Telefone" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
-        <input id="regPassword" type="password" required placeholder="Crie uma Senha" class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg focus:outline-none focus:border-green-500 dark-input" />
-        <button class="w-full px-4 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">Criar Conta</button>
-      </form>
-    </div>
-  </div>
-</section>
-
-<div class="w-full max-w-5xl mt-10">
-  <div id="alert-dashboard" class="hidden notification mb-4 p-3 rounded border"></div>
-
-  <section id="dashboardSection" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-semibold text-white">Painel</h2>
-      <div class="flex items-center gap-4">
-        <span id="currentBrokerName" class="text-gray-400"></span>
-        <button id="btn-logout" class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700">Sair</button>
-      </div>
-    </div>
-
-    <div id="shareLinkContainer" class="mb-6 p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
-      <label for="shareLink" class="block text-sm font-medium text-gray-300">Seu Link de Divulgação Exclusivo:</label>
-      <div class="flex items-center gap-2 mt-2">
-        <input type="text" id="shareLink" readonly class="w-full p-2 border border-neutral-600 bg-neutral-900 rounded-md text-sm text-gray-300">
-        <button id="btn-copy-link" class="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-700">Copiar</button>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-6">
-      <div class="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-white">Meus Imóveis</h3>
-          <button id="btn-new-property" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700">Novo imóvel</button>
-        </div>
-        <div id="propertiesList" class="space-y-3"></div>
-      </div>
-
-      <div class="bg-neutral-800/50 border border-neutral-700/50 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-white">Minha Agenda</h3>
-        </div>
-        <div id="appointmentsList" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm"></div>
-        <hr class="my-6 border-neutral-700" />
-        <h4 class="font-semibold text-white mb-3">Bloquear horário pessoal</h4>
-        <form id="blockTimeForm" class="grid sm:grid-cols-2 gap-4 items-end">
-          <input id="blockDate" type="date" required class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg" />
-          <input id="blockTime" type="time" required class="w-full p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg" />
-          <input id="blockReason" type="text" placeholder="Motivo (opcional)" class="w-full sm:col-span-2 p-3 bg-neutral-800 text-white border-2 border-neutral-700 rounded-lg dark-input" />
-          <button class="w-full sm:col-span-2 px-4 py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-600">Bloquear</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <section id="clientSection" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl shadow-lg p-6">
-    <div class="flex items-center justify-between mb-6">
-      <h2 id="client-title" class="text-2xl font-semibold text-white">Propriedades disponíveis</h2>
-      <button id="btn-back-to-login" class="px-4 py-2 bg-neutral-700 text-white text-sm font-semibold rounded-lg hover:bg-neutral-600">Voltar</button>
-    </div>
-    <div id="clientProperties" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-  </section>
+<div id="loginDiv" class="login-box">
+  <h2>Login do Corretor</h2>
+  <input type="text" id="username" placeholder="Nome de usuário" />
+  <input type="password" id="password" placeholder="Senha" />
+  <button onclick="login()">Entrar</button>
+  <p id="loginError" style="color:red; text-align:center;"></p>
 </div>
 
-<div id="modal" class="fixed inset-0 hidden items-center justify-center bg-black/80 p-4 z-50">
-  <div class="bg-neutral-900 border border-neutral-700 rounded-lg shadow-lg p-6 w-full max-w-lg">
-    <div id="modalContent"></div>
-    <div class="mt-6 text-right">
-      <button id="modalClose" class="px-4 py-2 bg-neutral-700 text-white rounded-lg hover:bg-neutral-600">Fechar</button>
-    </div>
+<div id="panelDiv">
+  <h1>Painel do Corretor</h1>
+  <h2 class="welcome" id="welcome"></h2>
+
+  <div class="form-container">
+    <input type="text" id="imovel" placeholder="Nome do imóvel" />
+    <input type="date" id="data" />
+    <input type="time" id="hora" />
+    <button onclick="addAppointment()">Adicionar</button>
+  </div>
+
+  <div class="cards-container" id="cardsContainer">
+    <!-- Cards de agendamento aparecerão aqui -->
   </div>
 </div>
 
 <script>
-const apiBase = "https://sheetdb.io/api/v1/f581ql5gbuc71";
-const imgbbApiKey = "c9e158216e49f2c854478979da850aff";
-let currentBroker = null;
+const sheetUrl = "https://api.sheetbest.com/sheets/5c119db8-bebe-428a-9f10-be9c58262adf";
 
-// alert
-function showAlert(id, msg, type="success"){
-  const el=document.getElementById(id);
-  el.textContent=msg;
-  el.className=`notification mb-4 p-3 rounded border ${type==="error"?"bg-red-600/30 border-red-500 text-red-200":"bg-green-600/30 border-green-500 text-green-200"}`;
-  el.classList.remove("hidden");
-  setTimeout(()=>el.classList.add("hidden"),4000);
-}
+// Corretores cadastrados
+const users = [
+  { username: "marcos", password: "123456", displayName: "Marcos Greijo" },
+  { username: "joao", password: "abc123", displayName: "João Silva" }
+];
 
-function showSection(id){
-  ["loginSection","dashboardSection","clientSection"].forEach(sec=>document.getElementById(sec).classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-// Registro
-registerForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  const novo={type:"corretor",name:regName.value,email:regEmail.value,password:regPassword.value,phone:regPhone.value,creci:regCreci.value};
-  await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[novo]})});
-  showAlert("alert-login","Conta criada com sucesso!","success");
-  e.target.reset();
-});
+let currentUser = null;
 
 // Login
-loginForm.addEventListener("submit", async e=>{
-  e.preventDefault();
-  const email=loginEmail.value, pass=loginPassword.value;
-  const res=await fetch(`${apiBase}/search?type=corretor&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
-  const data=await res.json();
-  if(data.length){
-    currentBroker=data[0];
-    document.getElementById("currentBrokerName").textContent=currentBroker.name;
-    document.getElementById("shareLink").value=window.location.origin+"?broker="+encodeURIComponent(currentBroker.email);
-    showSection("dashboardSection");
-    loadProperties();
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const user = users.find(u => u.username === username && u.password === password);
+  if(user) {
+    currentUser = user;
+    document.getElementById("loginDiv").style.display = "none";
+    document.getElementById("panelDiv").style.display = "block";
+    document.getElementById("welcome").innerText = `Bem-vindo, ${user.displayName}`;
     loadAppointments();
-  }else showAlert("alert-login","Credenciais inválidas","error");
-});
-
-// Logout
-btn-logout.onclick=()=>{ currentBroker=null; showSection("loginSection"); };
-
-// Novo imóvel
-btn-new-property.onclick=()=>{
-  modal.classList.remove("hidden");
-  modalContent.innerHTML=`
-    <h3 class="text-xl text-white mb-3">Novo Imóvel</h3>
-    <form id="newPropertyForm" class="space-y-3">
-      <input type="text" id="propTitle" required placeholder="Título" class="w-full p-2 bg-neutral-800 text-white rounded"/>
-      <input type="file" id="propImage" accept="image/*" required class="w-full"/>
-      <textarea id="propDesc" placeholder="Descrição" class="w-full p-2 bg-neutral-800 text-white rounded"></textarea>
-      <button class="w-full bg-blue-600 text-white rounded p-2">Salvar</button>
-    </form>
-  `;
-  newPropertyForm.onsubmit=async ev=>{
-    ev.preventDefault();
-    const file=propImage.files[0];
-    const fd=new FormData();
-    fd.append("image",file);
-    const upload=await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`,{method:"POST",body:fd});
-    const upRes=await upload.json();
-    const obj={type:"imovel",title:propTitle.value,description:propDesc.value,imageUrl:upRes.data.url,owner:currentBroker.email};
-    await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[obj]})});
-    loadProperties();
-    modal.classList.add("hidden");
-  };
-};
-modalClose.onclick=()=> modal.classList.add("hidden");
-
-// Carregar imóveis
-async function loadProperties(){
-  if(!currentBroker) return;
-  const res=await fetch(`${apiBase}/search?type=imovel&owner=${encodeURIComponent(currentBroker.email)}`);
-  const data=await res.json();
-  propertiesList.innerHTML="";
-  data.forEach(prop=>{
-    propertiesList.innerHTML+=`<div class="p-3 border border-neutral-700 rounded bg-neutral-800"><h4 class="font-semibold text-white">${prop.title}</h4><img src="${prop.imageUrl}" class="w-full h-32 object-cover rounded my-2"/><p class="text-sm text-gray-300">${prop.description||""}</p></div>`;
-  });
+  } else {
+    document.getElementById("loginError").innerText = "Usuário ou senha incorretos!";
+  }
 }
 
-// Bloquear horário
-blockTimeForm.onsubmit=async e=>{
-  e.preventDefault();
-  if(!currentBroker) return;
-  const obj={type:"agenda",owner:currentBroker.email,date:blockDate.value,time:blockTime.value,reason:blockReason.value||""};
-  await fetch(apiBase,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:[obj]})});
-  loadAppointments();
-  e.target.reset();
-};
-
-// Carregar agenda
-async function loadAppointments(){
-  if(!currentBroker) return;
-  const res=await fetch(`${apiBase}/search?type=agenda&owner=${encodeURIComponent(currentBroker.email)}`);
-  const data=await res.json();
-  appointmentsList.innerHTML="";
-  data.forEach(app=>{
-    appointmentsList.innerHTML+=`<div class="p-2 border border-neutral-700 rounded bg-neutral-800 text-white text-sm">${app.date} ${app.time} ${app.reason? "- "+app.reason : ""}</div>`;
-  });
+// Carrega agendamentos do corretor
+function loadAppointments() {
+  fetch(sheetUrl)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("cardsContainer");
+      container.innerHTML = "";
+      const myAppointments = data.filter(row => row.Corretor === currentUser.username);
+      myAppointments.forEach(row => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `
+          <h3>${row.Imovel || ''}</h3>
+          <p><strong>Data:</strong> ${row.Data || ''}</p>
+          <p><strong>Hora:</strong> ${row.Hora || ''}</p>
+        `;
+        container.appendChild(card);
+      });
+    })
+    .catch(err => console.error("Erro ao carregar agenda:", err));
 }
 
-// Cliente
-btn-show-client-interface.onclick=()=>{
-  showSection("clientSection");
-  loadClientProperties();
-};
-btn-back-to-login.onclick=()=> showSection("loginSection");
+// Adiciona novo agendamento
+function addAppointment() {
+  const imovel = document.getElementById("imovel").value.trim();
+  const data = document.getElementById("data").value;
+  const hora = document.getElementById("hora").value;
 
-async function loadClientProperties(){
-  const res=await fetch(`${apiBase}/search?type=imovel`);
-  const data=await res.json();
-  clientProperties.innerHTML="";
-  data.forEach(prop=>{
-    clientProperties.innerHTML+=`<div class="p-3 border border-neutral-700 rounded bg-neutral-800"><h4 class="font-semibold text-white">${prop.title}</h4><img src="${prop.imageUrl}" class="w-full h-32 object-cover rounded my-2"/><p class="text-sm text-gray-300">${prop.description||""}</p></div>`;
-  });
+  if(!imovel || !data || !hora) { alert("Preencha todos os campos!"); return; }
+
+  fetch(sheetUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      Corretor: currentUser.username,
+      Imovel: imovel,
+      Data: data,
+      Hora: hora
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    document.getElementById("imovel").value = "";
+    document.getElementById("data").value = "";
+    document.getElementById("hora").value = "";
+    loadAppointments();
+  })
+  .catch(err => console.error("Erro ao adicionar agendamento:", err));
 }
-
-// Copiar link
-btn-copy-link.onclick=()=>{ shareLink.select(); navigator.clipboard.writeText(shareLink.value); showAlert("alert-dashboard","Link copiado!"); };
 </script>
+
 </body>
 </html>
