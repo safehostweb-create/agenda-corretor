@@ -1,68 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teste API Google Script</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste API Google Apps Script</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #111; 
-      color: #eee; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      height: 100vh; 
-    }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      background: #ff4081;
-      color: white;
-      cursor: pointer;
-    }
-    pre {
-      background: #222;
-      padding: 15px;
-      border-radius: 6px;
-      max-width: 90%;
-      overflow-x: auto;
-    }
+    :root { --bg:#0b0b0b; --card:#121212; --accent:#ff4081; --text:#eee; }
+    body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:var(--bg); color:var(--text); font-family:Inter, system-ui, Arial; }
+    .wrap{ width:100%; max-width:880px; padding:40px; text-align:center; }
+    h1{ margin:0 0 24px; font-size:28px; }
+    .controls{ display:flex; gap:12px; justify-content:center; margin-bottom:18px; }
+    button{ background:var(--accent); border:none; padding:10px 18px; color:#fff; border-radius:8px;
+      cursor:pointer; font-weight:600; }
+    button[disabled]{ opacity:0.5; cursor:not-allowed; }
+    pre{ background:var(--card); padding:16px; border-radius:8px; text-align:left; max-height:300px;
+      overflow:auto; white-space:pre-wrap; word-break:break-word; color:#cfcfcf; }
+    .hint{ margin-top:12px; color:#bbb; font-size:13px; }
   </style>
 </head>
 <body>
-  <h1>Teste API Google Apps Script</h1>
-  <button onclick="fazerGet()">Fazer GET</button>
-  <button onclick="fazerPost()">Fazer POST</button>
-  <pre id="saida">Clique em um botão para testar...</pre>
+  <div class="wrap">
+    <h1>Teste API Google Apps Script</h1>
+    <div class="controls">
+      <button id="btnGet">Fazer GET</button>
+      <button id="btnPost">Fazer POST</button>
+    </div>
+    <pre id="saida">Clique em um botão para testar...</pre>
+    <div class="hint">Abra o Console (F12) e a aba Network para depuração detalhada.</div>
+  </div>
 
   <script>
+    // URL do seu Apps Script (já preenchida com a sua)
     const API_URL = "https://script.google.com/macros/s/AKfycbwc2dwL29i7pyg0D9bgt-ve2Phcmex9-X93hjmeMgHvs_NypCRc78Z7bMdnnSX5e-iK/exec";
 
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btnGet').addEventListener('click', fazerGet);
+      document.getElementById('btnPost').addEventListener('click', fazerPost);
+    });
+
+    function showOutput(title, data) {
+      const out = document.getElementById('saida');
+      out.textContent = `${title} → ${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}`;
+      console.log(title, data);
+    }
+
     async function fazerGet() {
+      const btn = document.getElementById('btnGet');
+      btn.disabled = true;
+      showOutput('GET', 'Enviando...');
       try {
-        const res = await fetch(API_URL + "?teste=123");
-        const data = await res.json();
-        document.getElementById("saida").textContent = JSON.stringify(data, null, 2);
+        const url = API_URL + '?teste=123';
+        console.log('GET ->', url);
+        const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+        console.log('Resposta HTTP', res.status, res.statusText);
+
+        const text = await res.text();
+        let body;
+        try { body = JSON.parse(text); } catch (e) { body = text; }
+
+        if (!res.ok) {
+          showOutput('GET erro (HTTP '+res.status+')', body);
+          return;
+        }
+        showOutput('GET OK', body);
       } catch (err) {
-        document.getElementById("saida").textContent = "Erro: " + err.message;
+        // "Failed to fetch" e outros aparecem aqui
+        showOutput('GET Error', { message: err.message });
+        console.error(err);
+      } finally {
+        btn.disabled = false;
       }
     }
 
     async function fazerPost() {
+      const btn = document.getElementById('btnPost');
+      btn.disabled = true;
+      showOutput('POST', 'Enviando...');
       try {
+        const payload = { nome: "Marcos", projeto: "Teste CORS" };
+        console.log('POST ->', API_URL, payload);
+
         const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome: "Marcos", projeto: "Teste CORS" })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
-        const data = await res.json();
-        document.getElementById("saida").textContent = JSON.stringify(data, null, 2);
+
+        console.log('Resposta HTTP', res.status, res.statusText);
+        const text = await res.text();
+        let body;
+        try { body = JSON.parse(text); } catch (e) { body = text; }
+
+        if (!res.ok) {
+          showOutput('POST erro (HTTP '+res.status+')', body);
+          return;
+        }
+        showOutput('POST OK', body);
       } catch (err) {
-        document.getElementById("saida").textContent = "Erro: " + err.message;
+        showOutput('POST Error', { message: err.message });
+        console.error(err);
+      } finally {
+        btn.disabled = false;
       }
     }
   </script>
