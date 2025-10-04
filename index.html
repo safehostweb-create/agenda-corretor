@@ -1,32 +1,70 @@
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbw.../exec";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste API Google Script</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #111; 
+      color: #eee; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100vh; 
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #ff4081;
+      color: white;
+      cursor: pointer;
+    }
+    pre {
+      background: #222;
+      padding: 15px;
+      border-radius: 6px;
+      max-width: 90%;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Teste API Google Apps Script</h1>
+  <button onclick="fazerGet()">Fazer GET</button>
+  <button onclick="fazerPost()">Fazer POST</button>
+  <pre id="saida">Clique em um botão para testar...</pre>
 
-// Exemplo de GET
-async function testGet() {
-  try {
-    const res = await fetch(`${API_URL}?teste=123`);
-    const data = await res.json();
-    console.log("GET OK:", data);
-  } catch (err) {
-    console.error("Erro GET:", err);
-  }
-}
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwc2dwL29i7pyg0D9bgt-ve2Phcmex9-X93hjmeMgHvs_NypCRc78Z7bMdnnSX5e-iK/exec";
 
-// Exemplo de POST
-async function testPost() {
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: "Marcos", funcao: "Corretor de Elite" })
-    });
-    const data = await res.json();
-    console.log("POST OK:", data);
-  } catch (err) {
-    console.error("Erro POST:", err);
-  }
-}
+    async function fazerGet() {
+      try {
+        const res = await fetch(API_URL + "?teste=123");
+        const data = await res.json();
+        document.getElementById("saida").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("saida").textContent = "Erro: " + err.message;
+      }
+    }
 
-testGet();
-testPost();
-</script>
+    async function fazerPost() {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome: "Marcos", projeto: "Teste CORS" })
+        });
+        const data = await res.json();
+        document.getElementById("saida").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("saida").textContent = "Erro: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
