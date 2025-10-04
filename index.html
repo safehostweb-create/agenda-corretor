@@ -1,111 +1,323 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Teste API Google Apps Script</title>
-  <style>
-    :root { --bg:#0b0b0b; --card:#121212; --accent:#ff4081; --text:#eee; }
-    body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background:var(--bg); color:var(--text); font-family:Inter, system-ui, Arial; }
-    .wrap{ width:100%; max-width:880px; padding:40px; text-align:center; }
-    h1{ margin:0 0 24px; font-size:28px; }
-    .controls{ display:flex; gap:12px; justify-content:center; margin-bottom:18px; }
-    button{ background:var(--accent); border:none; padding:10px 18px; color:#fff; border-radius:8px;
-      cursor:pointer; font-weight:600; }
-    button[disabled]{ opacity:0.5; cursor:not-allowed; }
-    pre{ background:var(--card); padding:16px; border-radius:8px; text-align:left; max-height:300px;
-      overflow:auto; white-space:pre-wrap; word-break:break-word; color:#cfcfcf; }
-    .hint{ margin-top:12px; color:#bbb; font-size:13px; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agenda Corretor - Premium</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
+    .hidden { display: none; }
+</style>
 </head>
-<body>
-  <div class="wrap">
-    <h1>Teste API Google Apps Script</h1>
-    <div class="controls">
-      <button id="btnGet">Fazer GET</button>
-      <button id="btnPost">Fazer POST</button>
+<body class="bg-slate-900 text-gray-300 antialiased">
+<div class="container mx-auto p-4 flex flex-col min-h-screen">
+
+<main class="flex-grow flex flex-col items-center justify-center">
+    
+    <div id="main-content" class="w-full">
+        <div id="auth-container" class="w-full max-w-4xl mx-auto">
+            <header class="flex justify-between items-center mb-10 px-2">
+                <h1 class="text-3xl font-bold text-white tracking-wide">
+                    Agenda do Corretor
+                </h1>
+                <div class="flex gap-2">
+                    <button id="btn-show-client" class="px-4 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-md text-sm">
+                        Acesso Cliente
+                    </button>
+                </div>
+            </header>
+            
+            <div id="login-register-grid" class="grid md:grid-cols-2 gap-8">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-2xl">
+                    <h2 class="text-3xl font-bold text-white text-center mb-6">Login</h2>
+                    <form id="login-form" class="space-y-4">
+                        <input id="username" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Nome Completo" required />
+                        <input id="password" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" type="password" placeholder="Senha" required />
+                        <button type="submit" class="w-full py-3 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition-colors">Entrar</button>
+                    </form>
+                    <p id="loginError" class="text-sm text-center mt-4 text-red-400"></p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-2xl">
+                    <h2 class="text-3xl font-bold text-white text-center mb-6">Criar Conta</h2>
+                    <form id="register-form" class="space-y-4">
+                        <input id="nome" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Nome Completo (obrigatório)" required />
+                        <input id="email" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="E-mail" />
+                        <input id="telefone" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Telefone (obrigatório)" required />
+                        <input id="creci" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="CRECI (obrigatório)" required />
+                        <input id="senha" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" type="password" placeholder="Senha (obrigatório)" required />
+                        <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-colors">Cadastrar</button>
+                    </form>
+                    <p id="registerMsg" class="text-sm text-center mt-4"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="panelDiv" class="max-w-4xl mx-auto hidden"></div>
+
+        <div id="clientDiv" class="hidden">
+            <header class="flex justify-between items-center mb-8">
+                <h2 id="clientTitle" class="text-3xl font-bold text-white">Vitrine de Imóveis</h2>
+                <button class="py-2 px-4 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors text-sm" onclick="backHome()">Voltar ao Início</button>
+            </header>
+            <div id="clientCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
     </div>
-    <pre id="saida">Clique em um botão para testar...</pre>
-    <div class="hint">Abra o Console (F12) e a aba Network para depuração detalhada.</div>
-  </div>
+</main>
 
-  <script>
-    // ✅ ESTE É O LOCAL CORRETO PARA SUA URL
-    // Se um dia você publicar uma nova versão do script e a URL mudar,
-    // basta trocá-la apenas nesta linha.
-    const API_URL = "https://script.google.com/macros/s/AKfycbwc2dwL29i7pyg0D9bgt-ve2Phcmex9-X93hjmeMgHvs_NypCRc78Z7bMdnnSX5e-iK/exec";
+<footer class="text-center py-6 mt-auto">
+    <p class="text-sm font-semibold text-white">agência conceito</p>
+    <p class="text-xs text-slate-500 mt-1">
+        design by Marcos Greijo - +55 19 9.8906-5333
+    </p>
+</footer>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('btnGet').addEventListener('click', fazerGet);
-      document.getElementById('btnPost').addEventListener('click', fazerPost);
+</div>
+
+<script>
+// #################################################################
+// COLE A URL DA SUA IMPLANTAÇÃO DO APP DA WEB AQUI
+const SCRIPT_URL = "SUA_URL_DO_APP_DA_WEB_AQUI";
+// #################################################################
+
+let currentUser = null;
+
+// --- GERENCIAMENTO DE NAVEGAÇÃO E ESTADO ---
+function show(divId) {
+    ['auth-container', 'panelDiv', 'clientDiv'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== divId);
     });
+}
 
-    function showOutput(title, data) {
-      const out = document.getElementById('saida');
-      out.textContent = `${title} → ${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}`;
-      console.log(title, data);
-    }
+function backHome() {
+    localStorage.removeItem('loggedInUser');
+    currentUser = null;
+    show('auth-container');
+    window.history.pushState({}, document.title, window.location.pathname);
+}
 
-    async function fazerGet() {
-      const btn = document.getElementById('btnGet');
-      btn.disabled = true;
-      showOutput('GET', 'Enviando...');
-      try {
-        const url = API_URL + '?teste=123';
-        console.log('GET ->', url);
-        const res = await fetch(url, { method: 'GET', cache: 'no-store' });
-        console.log('Resposta HTTP', res.status, res.statusText);
+function logout() {
+    localStorage.removeItem('loggedInUser');
+    currentUser = null;
+    backHome();
+}
 
-        const text = await res.text();
-        let body;
-        try { body = JSON.parse(text); } catch (e) { body = text; }
-
-        if (!res.ok) {
-          showOutput('GET erro (HTTP '+res.status+')', body);
-          return;
+// --- CHAMADA DE API CENTRALIZADA ---
+async function apiCall(method, params = {}) {
+    document.body.style.cursor = 'wait';
+    try {
+        let url = SCRIPT_URL;
+        const options = {
+            method,
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' } // Para evitar preflight
+        };
+        if (method === 'GET') {
+            const query = new URLSearchParams(params).toString();
+            if (query) url += '?' + query;
+        } else { // POST
+            options.body = JSON.stringify(params);
+            options.method = 'POST'; // Garante que o método seja POST
         }
-        showOutput('GET OK', body);
-      } catch (err) {
-        // "Failed to fetch" e outros aparecem aqui
-        showOutput('GET Error', { message: err.message });
-        console.error(err);
-      } finally {
-        btn.disabled = false;
-      }
+        const resp = await fetch(url, options);
+        if (!resp.ok) throw new Error('Erro de rede: ' + resp.status);
+        return await resp.json();
+    } catch (e) {
+        console.error('API Error:', e);
+        alert("Erro de comunicação: " + e.message + ".\n\nVerifique o console (F12) para mais detalhes.");
+        return null;
+    } finally {
+        document.body.style.cursor = 'default';
+    }
+}
+
+// --- LÓGICA DE CADASTRO E LOGIN ---
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById('registerMsg');
+    const payload = {
+        type: 'cadastro',
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        creci: document.getElementById('creci').value,
+        senha: document.getElementById('senha').value
+    };
+    msgEl.textContent = 'Cadastrando...';
+    const result = await apiCall('POST', payload);
+    if (result && result.status === 'ok') {
+        msgEl.textContent = result.message;
+        msgEl.style.color = 'lightgreen';
+        e.target.reset();
+    } else {
+        msgEl.textContent = 'Erro: ' + (result ? result.message : 'Falha na comunicação.');
+        msgEl.style.color = 'tomato';
+    }
+});
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = 'Verificando...';
+    const users = await apiCall('GET', { action: 'getCorretores' });
+    if (!users || users.status === 'error') {
+        errorEl.textContent = 'Erro ao buscar usuários.';
+        return;
     }
 
-    async function fazerPost() {
-      const btn = document.getElementById('btnPost');
-      btn.disabled = true;
-      showOutput('POST', 'Enviando...');
-      try {
-        const payload = { nome: "Marcos", projeto: "Teste CORS" };
-        console.log('POST ->', API_URL, payload);
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const user = users.find(u => u.nome === username && u.senha === password);
 
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+    if (user) {
+        errorEl.textContent = '';
+        currentUser = user;
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+        openPanel();
+    } else {
+        errorEl.textContent = 'Nome de usuário ou senha incorretos.';
+    }
+});
 
-        console.log('Resposta HTTP', res.status, res.statusText);
-        const text = await res.text();
-        let body;
-        try { body = JSON.parse(text); } catch (e) { body = text; }
+// --- PAINEL DO CORRETOR ---
+function openPanel() {
+    if (!currentUser) return;
+    show('panelDiv');
+    const panel = document.getElementById('panelDiv');
+    const shareLink = `${window.location.origin}${window.location.pathname}?user=${encodeURIComponent(currentUser.nome)}`;
 
-        if (!res.ok) {
-          showOutput('POST erro (HTTP '+res.status+')', body);
-          return;
+    panel.innerHTML = `
+        <header class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-white">Olá, ${currentUser.nome.split(' ')[0]}!</h2>
+            <button class="py-2 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700" onclick="logout()">Sair</button>
+        </header>
+        <div class="space-y-8">
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 class="text-xl font-semibold mb-2 text-white">Seu Link de Divulgação</h3>
+                <div class="flex items-center gap-2 bg-slate-700 p-2 rounded-md">
+                    <input type="text" value="${shareLink}" id="share-link-input" class="w-full bg-transparent focus:outline-none text-gray-400" readonly>
+                    <button onclick="document.getElementById('share-link-input').select(); document.execCommand('copy'); alert('Link Copiado!');" class="px-3 py-1 bg-green-600 text-white rounded-md text-sm font-semibold">Copiar</button>
+                </div>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 class="text-xl font-semibold mb-6 text-white">Adicionar Novo Imóvel</h3>
+                <form id="imovel-form" class="grid md:grid-cols-2 gap-4">
+                    <input name="nome" placeholder="Título do Imóvel" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
+                    <input name="preco" placeholder="Preço (Ex: R$ 500.000,00)" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
+                    <input name="endereco" placeholder="Endereço Completo" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
+                    <input name="site" placeholder="Link do Site (Opcional)" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600">
+                    <textarea name="descricao" placeholder="Descrição do Imóvel" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600" rows="4" required></textarea>
+                    <div class="md:col-span-2">
+                        <h4 class="font-semibold mb-2 text-white">URLs das Fotos (até 10)</h4>
+                        <div class="space-y-2">${Array.from({length: 10}, (_, i) => `<input name="foto${i+1}" class="w-full p-2 bg-slate-700 rounded-md border border-slate-600 text-sm" placeholder="URL da Foto ${i+1}">`).join('')}</div>
+                    </div>
+                    <button type="submit" class="md:col-span-2 w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 mt-4">Cadastrar Imóvel</button>
+                    <p id="imovelMsg" class="md:col-span-2 text-sm text-center mt-2"></p>
+                </form>
+            </div>
+        </div>`;
+    
+    document.getElementById('imovel-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msgEl = document.getElementById('imovelMsg');
+        const formData = new FormData(e.target);
+        const fotos = [];
+        for(let i = 1; i <= 10; i++) {
+            const foto = formData.get(`foto${i}`);
+            if(foto) fotos.push(foto);
         }
-        showOutput('POST OK', body);
-      } catch (err) {
-        showOutput('POST Error', { message: err.message });
-        console.error(err);
-      } finally {
-        btn.disabled = false;
-      }
+        const payload = {
+            type: 'imovel',
+            corretor: currentUser.nome,
+            nome: formData.get('nome'),
+            preco: formData.get('preco'),
+            endereco: formData.get('endereco'),
+            site: formData.get('site'),
+            descricao: formData.get('descricao'),
+            fotos: fotos
+        };
+        msgEl.textContent = 'Cadastrando imóvel...';
+        const result = await apiCall('POST', payload);
+        if (result && result.status === 'ok') {
+            msgEl.textContent = result.message;
+            msgEl.style.color = 'lightgreen';
+            e.target.reset();
+        } else {
+            msgEl.textContent = 'Erro: ' + (result ? result.message : 'Falha na comunicação.');
+            msgEl.style.color = 'tomato';
+        }
+    });
+}
+
+// --- VITRINE DE CLIENTES ---
+async function showClient(corretorNome = null) {
+    show('clientDiv');
+    const grid = document.getElementById('clientCards');
+    grid.innerHTML = '<p class="text-center col-span-full">Carregando imóveis...</p>';
+
+    const [properties, users] = await Promise.all([
+        apiCall('GET', { action: 'getImoveis' }),
+        apiCall('GET', { action: 'getCorretores' })
+    ]);
+
+    if (!properties || properties.status === 'error' || !users || users.status === 'error') {
+        grid.innerHTML = '<p class="text-center col-span-full">Não foi possível carregar os imóveis.</p>';
+        return;
     }
-  </script>
+
+    let filtered = corretorNome ? properties.filter(p => p.corretor === corretorNome) : properties;
+    document.getElementById('clientTitle').textContent = corretorNome ? `Imóveis de ${corretorNome}` : 'Nossos Imóveis';
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '<p class="text-center col-span-full">Nenhum imóvel encontrado.</p>';
+        return;
+    }
+
+    grid.innerHTML = '';
+    filtered.forEach(prop => {
+        const corretor = users.find(u => u.nome === prop.corretor);
+        const fotos = prop.fotos ? JSON.parse(prop.fotos) : [];
+        const fotoPrincipal = fotos[0] || 'https://via.placeholder.com/400x300.png?text=Sem+Foto';
+        grid.innerHTML += `
+            <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-lg flex flex-col">
+                <img src="${fotoPrincipal}" alt="${prop.nome}" class="w-full h-48 object-cover">
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="text-xl font-bold text-white mb-2">${prop.nome}</h3>
+                    <p class="text-2xl font-semibold text-green-400 mb-2">${prop.preco}</p>
+                    <p class="text-slate-400 text-sm mb-4">${prop.endereco}</p>
+                    <p class="text-slate-300 mb-4 flex-grow text-sm">${prop.descricao}</p>
+                    <div class="border-t border-slate-700 pt-3 mt-auto text-sm">
+                        <p class="font-semibold text-white">${corretor?.nome || ''}</p>
+                        <p class="text-slate-400">CRECI: ${corretor?.creci || ''}</p>
+                        <p class="text-slate-400">Telefone: ${corretor?.telefone || ''}</p>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        ${prop.site ? `<a href="${prop.site}" target="_blank" class="flex-1 text-center bg-gray-600 hover:bg-gray-700 p-2 rounded-md font-semibold text-sm">Ver Site</a>` : ''}
+                        <a href="https://wa.me/${(corretor?.telefone || '').replace(/\D/g,'')}" target="_blank" class="flex-1 text-center bg-green-600 hover:bg-green-700 p-2 rounded-md font-semibold text-sm">Agendar Visita</a>
+                    </div>
+                </div>
+            </div>`;
+    });
+}
+
+// --- EVENT LISTENERS E INICIALIZAÇÃO ---
+document.addEventListener('DOMContentLoaded', () => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const urlParams = new URLSearchParams(window.location.search);
+    const userParam = urlParams.get('user');
+
+    if (loggedInUser) {
+        currentUser = loggedInUser;
+        openPanel();
+    } else if (userParam) {
+        showClient(userParam);
+    } else {
+        show('auth-container');
+    }
+
+    document.getElementById('btn-show-client').addEventListener('click', () => showClient());
+});
+
+</script>
 </body>
 </html>
