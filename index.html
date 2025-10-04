@@ -1,275 +1,275 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Agenda Corretor - Premium</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
-    .hidden { display: none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Corretor - Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hidden { display: none !important; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body class="bg-slate-900 text-gray-300 antialiased">
-<div class="container mx-auto p-4 flex flex-col min-h-screen">
-
-<main class="flex-grow flex flex-col items-center justify-center">
-    
-    <div id="main-content" class="w-full">
-        <div id="auth-container" class="w-full max-w-4xl mx-auto">
-            <header class="flex justify-between items-center mb-10 px-2">
-                <h1 class="text-3xl font-bold text-white tracking-wide">
-                    Agenda do Corretor
-                </h1>
-                <div class="flex gap-2">
-                    <button id="btn-show-client" class="px-4 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors shadow-md text-sm">
-                        Acesso Cliente
-                    </button>
-                </div>
+<body class="bg-gray-900 text-gray-200 antialiased">
+    <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-screen">
+        
+        <section id="auth-section" class="flex-grow flex flex-col items-center justify-center">
+            <header class="w-full max-w-6xl mx-auto absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-between items-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Agenda do Corretor</h1>
+                <button onclick="showClientView()" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-md text-sm sm:text-base">Acesso Cliente</button>
             </header>
-            
-            <div id="login-register-grid" class="grid md:grid-cols-2 gap-8">
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-2xl">
+            <div class="w-full max-w-6xl grid md:grid-cols-2 gap-8 mt-24 md:mt-0">
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 sm:p-8 shadow-2xl">
                     <h2 class="text-3xl font-bold text-white text-center mb-6">Login</h2>
                     <form id="login-form" class="space-y-4">
-                        <input id="username" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="Nome Completo" required />
-                        <input id="password" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none" type="password" placeholder="Senha" required />
-                        <button type="submit" class="w-full py-3 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-700 transition-colors">Entrar</button>
+                        <input name="username" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Nome Completo" required />
+                        <input name="password" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" type="password" placeholder="Senha" required />
+                        <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">Entrar</button>
                     </form>
-                    <p id="loginError" class="text-sm text-center mt-4 text-red-400"></p>
+                    <p id="login-error" class="text-sm text-center mt-4 text-red-400 h-5"></p>
                 </div>
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-2xl">
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 sm:p-8 shadow-2xl">
                     <h2 class="text-3xl font-bold text-white text-center mb-6">Criar Conta</h2>
                     <form id="register-form" class="space-y-4">
-                        <input id="nome" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Nome Completo (obrigatório)" required />
-                        <input id="email" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="E-mail" />
-                        <input id="telefone" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Telefone (obrigatório)" required />
-                        <input id="creci" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="CRECI (obrigatório)" required />
-                        <input id="senha" class="w-full p-3 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" type="password" placeholder="Senha (obrigatório)" required />
-                        <button type="submit" class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 transition-colors">Cadastrar</button>
+                        <input name="nome" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Nome Completo" required />
+                        <input name="email" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="E-mail" />
+                        <input name="telefone" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Telefone" required />
+                        <input name="creci" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="CRECI" required />
+                        <input name="senha" class="w-full p-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" type="password" placeholder="Senha" required />
+                        <button type="submit" class="w-full py-3 px-6 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">Cadastrar</button>
                     </form>
-                    <p id="registerMsg" class="text-sm text-center mt-4"></p>
+                    <p id="register-msg" class="text-sm text-center mt-4 h-5"></p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="panelDiv" class="max-w-4xl mx-auto hidden"></div>
+        <section id="panel-section" class="hidden w-full max-w-5xl mx-auto"></section>
 
-        <div id="clientDiv" class="hidden">
-            <header class="flex justify-between items-center mb-8">
-                <h2 id="clientTitle" class="text-3xl font-bold text-white">Vitrine de Imóveis</h2>
-                <button class="py-2 px-4 bg-slate-600 text-white font-semibold rounded-lg hover:bg-slate-700 transition-colors text-sm" onclick="backHome()">Voltar ao Início</button>
-            </header>
-            <div id="clientCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </div>
+        <section id="client-section" class="hidden w-full max-w-7xl mx-auto"></section>
+
+        <footer class="text-center py-6 mt-auto">
+            <p class="text-sm text-gray-400">Design por Marcos Greijo</p>
+        </footer>
     </div>
-</main>
-
-<footer class="text-center py-6 mt-auto">
-    <p class="text-sm font-semibold text-white">agência conceito</p>
-    <p class="text-xs text-slate-500 mt-1">
-        design by Marcos Greijo - +55 19 9.8906-5333
-    </p>
-</footer>
-
-</div>
 
 <script>
-// #################################################################
-// COLE A URL DA SUA IMPLANTAÇÃO DO APP DA WEB AQUI
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwc2dwL29i7pyg0D9bgt-ve2Phcmex9-X93hjmeMgHvs_NypCRc78Z7bMdnnSX5e-iK/exec";
-// #################################################################
+// =================================================================
+// ETAPA C: COLE A NOVA URL DO SEU APP DA WEB AQUI
+// =================================================================
+const SCRIPT_URL = "SUA_NOVA_URL_AQUI";
+// =================================================================
 
 let currentUser = null;
 
-// --- GERENCIAMENTO DE NAVEGAÇÃO E ESTADO ---
-function show(divId) {
-    ['auth-container', 'panelDiv', 'clientDiv'].forEach(id => {
-        document.getElementById(id).classList.toggle('hidden', id !== divId);
+// --- FUNÇÕES UTILITÁRIAS E DE NAVEGAÇÃO ---
+function showView(viewId) {
+    ['auth-section', 'panel-section', 'client-section'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
     });
+    document.getElementById(viewId).classList.remove('hidden');
 }
 
-function backHome() {
-    localStorage.removeItem('loggedInUser');
-    currentUser = null;
-    show('auth-container');
-    window.history.pushState({}, document.title, window.location.pathname);
+function showLoader(button) {
+    button.disabled = true;
+    button.dataset.originalText = button.innerHTML;
+    button.innerHTML = '<div class="loader"></div>';
+}
+
+function hideLoader(button) {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText;
 }
 
 function logout() {
     localStorage.removeItem('loggedInUser');
     currentUser = null;
-    backHome();
+    window.history.pushState({}, '', window.location.pathname);
+    showView('auth-section');
 }
 
-// --- CHAMADA DE API CENTRALIZADA ---
 async function apiCall(method, params = {}) {
-    document.body.style.cursor = 'wait';
     try {
         let url = SCRIPT_URL;
-        const options = {
-            method,
-            redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' } // Para evitar preflight
-        };
+        const options = { method, redirect: 'follow' };
+
         if (method === 'GET') {
             const query = new URLSearchParams(params).toString();
             if (query) url += '?' + query;
         } else { // POST
             options.body = JSON.stringify(params);
-            options.method = 'POST'; // Garante que o método seja POST
         }
+        
         const resp = await fetch(url, options);
-        if (!resp.ok) throw new Error('Erro de rede: ' + resp.status);
+        if (!resp.ok) throw new Error(`Erro de rede: ${resp.status}`);
         return await resp.json();
     } catch (e) {
         console.error('API Error:', e);
-        alert("Erro de comunicação: " + e.message + ".\n\nVerifique o console (F12) para mais detalhes.");
+        alert(`Erro de comunicação: ${e.message}\nVerifique o console (F12) para detalhes.`);
         return null;
-    } finally {
-        document.body.style.cursor = 'default';
     }
 }
 
-// --- LÓGICA DE CADASTRO E LOGIN ---
+// --- LÓGICA DE LOGIN E CADASTRO ---
 document.getElementById('register-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const msgEl = document.getElementById('registerMsg');
-    const payload = {
-        type: 'cadastro',
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefone: document.getElementById('telefone').value,
-        creci: document.getElementById('creci').value,
-        senha: document.getElementById('senha').value
-    };
-    msgEl.textContent = 'Cadastrando...';
+    const form = e.target;
+    const button = form.querySelector('button');
+    const msgEl = document.getElementById('register-msg');
+    const formData = new FormData(form);
+    const payload = { type: 'cadastro', ...Object.fromEntries(formData) };
+    
+    showLoader(button);
+    msgEl.textContent = '';
     const result = await apiCall('POST', payload);
+    hideLoader(button);
+
     if (result && result.status === 'ok') {
         msgEl.textContent = result.message;
-        msgEl.style.color = 'lightgreen';
-        e.target.reset();
+        msgEl.className = 'text-sm text-center mt-4 h-5 text-green-400';
+        form.reset();
     } else {
-        msgEl.textContent = 'Erro: ' + (result ? result.message : 'Falha na comunicação.');
-        msgEl.style.color = 'tomato';
+        msgEl.textContent = result?.message || 'Falha na comunicação.';
+        msgEl.className = 'text-sm text-center mt-4 h-5 text-red-400';
     }
 });
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const errorEl = document.getElementById('loginError');
-    errorEl.textContent = 'Verificando...';
+    const form = e.target;
+    const button = form.querySelector('button');
+    const errorEl = document.getElementById('login-error');
+    const formData = new FormData(form);
+    const username = formData.get('username');
+    const password = formData.get('password');
+
+    showLoader(button);
+    errorEl.textContent = '';
     const users = await apiCall('GET', { action: 'getCorretores' });
+    hideLoader(button);
+
     if (!users || users.status === 'error') {
         errorEl.textContent = 'Erro ao buscar usuários.';
         return;
     }
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
     const user = users.find(u => u.nome === username && u.senha === password);
-
     if (user) {
-        errorEl.textContent = '';
         currentUser = user;
         localStorage.setItem('loggedInUser', JSON.stringify(user));
-        openPanel();
+        renderPanelView();
     } else {
         errorEl.textContent = 'Nome de usuário ou senha incorretos.';
     }
 });
 
-// --- PAINEL DO CORRETOR ---
-function openPanel() {
+// --- RENDERIZAÇÃO DAS SEÇÕES ---
+function renderPanelView() {
     if (!currentUser) return;
-    show('panelDiv');
-    const panel = document.getElementById('panelDiv');
+    showView('panel-section');
+    const panel = document.getElementById('panel-section');
     const shareLink = `${window.location.origin}${window.location.pathname}?user=${encodeURIComponent(currentUser.nome)}`;
-
     panel.innerHTML = `
         <header class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-white">Olá, ${currentUser.nome.split(' ')[0]}!</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white">Olá, ${currentUser.nome.split(' ')[0]}!</h2>
             <button class="py-2 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700" onclick="logout()">Sair</button>
         </header>
         <div class="space-y-8">
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                <h3 class="text-xl font-semibold mb-2 text-white">Seu Link de Divulgação</h3>
-                <div class="flex items-center gap-2 bg-slate-700 p-2 rounded-md">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h3 class="text-xl font-semibold mb-3 text-white">Seu Link de Divulgação</h3>
+                <div class="flex items-center gap-2 bg-gray-700 p-2 rounded-lg">
                     <input type="text" value="${shareLink}" id="share-link-input" class="w-full bg-transparent focus:outline-none text-gray-400" readonly>
-                    <button onclick="document.getElementById('share-link-input').select(); document.execCommand('copy'); alert('Link Copiado!');" class="px-3 py-1 bg-green-600 text-white rounded-md text-sm font-semibold">Copiar</button>
+                    <button onclick="navigator.clipboard.writeText('${shareLink}'); alert('Link Copiado!');" class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-semibold">Copiar</button>
                 </div>
             </div>
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
                 <h3 class="text-xl font-semibold mb-6 text-white">Adicionar Novo Imóvel</h3>
                 <form id="imovel-form" class="grid md:grid-cols-2 gap-4">
-                    <input name="nome" placeholder="Título do Imóvel" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
-                    <input name="preco" placeholder="Preço (Ex: R$ 500.000,00)" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
-                    <input name="endereco" placeholder="Endereço Completo" class="w-full p-3 bg-slate-700 rounded-lg border border-slate-600" required>
-                    <input name="site" placeholder="Link do Site (Opcional)" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600">
-                    <textarea name="descricao" placeholder="Descrição do Imóvel" class="md:col-span-2 w-full p-3 bg-slate-700 rounded-lg border border-slate-600" rows="4" required></textarea>
-                    <div class="md:col-span-2">
-                        <h4 class="font-semibold mb-2 text-white">URLs das Fotos (até 10)</h4>
-                        <div class="space-y-2">${Array.from({length: 10}, (_, i) => `<input name="foto${i+1}" class="w-full p-2 bg-slate-700 rounded-md border border-slate-600 text-sm" placeholder="URL da Foto ${i+1}">`).join('')}</div>
-                    </div>
-                    <button type="submit" class="md:col-span-2 w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 mt-4">Cadastrar Imóvel</button>
-                    <p id="imovelMsg" class="md:col-span-2 text-sm text-center mt-2"></p>
+                    <p id="imovel-msg" class="md:col-span-2 text-sm text-center mt-2 h-5"></p>
                 </form>
             </div>
         </div>`;
     
-    document.getElementById('imovel-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msgEl = document.getElementById('imovelMsg');
-        const formData = new FormData(e.target);
-        const fotos = [];
-        for(let i = 1; i <= 10; i++) {
-            const foto = formData.get(`foto${i}`);
-            if(foto) fotos.push(foto);
-        }
-        const payload = {
-            type: 'imovel',
-            corretor: currentUser.nome,
-            nome: formData.get('nome'),
-            preco: formData.get('preco'),
-            endereco: formData.get('endereco'),
-            site: formData.get('site'),
-            descricao: formData.get('descricao'),
-            fotos: fotos
-        };
-        msgEl.textContent = 'Cadastrando imóvel...';
-        const result = await apiCall('POST', payload);
-        if (result && result.status === 'ok') {
-            msgEl.textContent = result.message;
-            msgEl.style.color = 'lightgreen';
-            e.target.reset();
-        } else {
-            msgEl.textContent = 'Erro: ' + (result ? result.message : 'Falha na comunicação.');
-            msgEl.style.color = 'tomato';
-        }
-    });
+    // Gerar campos do formulário de imóvel dinamicamente
+    const imovelForm = document.getElementById('imovel-form');
+    imovelForm.insertAdjacentHTML('afterbegin', `
+        <input name="nome" placeholder="Título do Imóvel" class="md:col-span-2 w-full p-3 bg-gray-700 rounded-lg border border-gray-600" required>
+        <input name="preco" placeholder="Preço (Ex: R$ 500.000,00)" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600" required>
+        <input name="endereco" placeholder="Endereço Completo" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600" required>
+        <input name="site" placeholder="Link do Site (Opcional)" class="md:col-span-2 w-full p-3 bg-gray-700 rounded-lg border border-gray-600">
+        <textarea name="descricao" placeholder="Descrição do Imóvel" class="md:col-span-2 w-full p-3 bg-gray-700 rounded-lg border border-gray-600" rows="4" required></textarea>
+        <div class="md:col-span-2">
+            <h4 class="font-semibold mb-2 text-white">URLs das Fotos (até 10)</h4>
+            <div class="space-y-2">${Array.from({length: 10}, (_, i) => `<input name="foto${i+1}" class="w-full p-2 bg-gray-700 rounded-md border border-gray-600 text-sm" placeholder="URL da Foto ${i+1}">`).join('')}</div>
+        </div>
+        <button type="submit" class="md:col-span-2 w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 mt-4 flex items-center justify-center gap-2">Cadastrar Imóvel</button>
+    `);
+    
+    imovelForm.addEventListener('submit', handleImovelSubmit);
 }
 
-// --- VITRINE DE CLIENTES ---
-async function showClient(corretorNome = null) {
-    show('clientDiv');
-    const grid = document.getElementById('clientCards');
-    grid.innerHTML = '<p class="text-center col-span-full">Carregando imóveis...</p>';
+async function handleImovelSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const button = form.querySelector('button');
+    const msgEl = document.getElementById('imovel-msg');
+    const formData = new FormData(form);
+    const fotos = [];
+    for(let i = 1; i <= 10; i++) {
+        const foto = formData.get(`foto${i}`);
+        if(foto) fotos.push(foto);
+    }
+    const payload = { type: 'imovel', corretor: currentUser.nome, fotos, ...Object.fromEntries(formData) };
+    
+    showLoader(button);
+    msgEl.textContent = '';
+    const result = await apiCall('POST', payload);
+    hideLoader(button);
 
+    if (result && result.status === 'ok') {
+        msgEl.textContent = result.message;
+        msgEl.className = 'md:col-span-2 text-sm text-center mt-2 h-5 text-green-400';
+        form.reset();
+    } else {
+        msgEl.textContent = result?.message || 'Falha na comunicação.';
+        msgEl.className = 'md:col-span-2 text-sm text-center mt-2 h-5 text-red-400';
+    }
+}
+
+async function showClientView(corretorNome = null) {
+    showView('client-section');
+    const clientSection = document.getElementById('client-section');
+    clientSection.innerHTML = `
+        <header class="flex justify-between items-center mb-8">
+            <h2 id="client-title" class="text-3xl font-bold text-white"></h2>
+            <button class="py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700" onclick="window.location.reload()">Voltar</button>
+        </header>
+        <div id="client-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="loader-container col-span-full flex justify-center p-8"><div class="loader"></div></div>
+        </div>`;
+    
     const [properties, users] = await Promise.all([
         apiCall('GET', { action: 'getImoveis' }),
         apiCall('GET', { action: 'getCorretores' })
     ]);
 
+    const grid = document.getElementById('client-cards');
     if (!properties || properties.status === 'error' || !users || users.status === 'error') {
-        grid.innerHTML = '<p class="text-center col-span-full">Não foi possível carregar os imóveis.</p>';
+        grid.innerHTML = '<p class="col-span-full text-center">Não foi possível carregar os imóveis.</p>';
         return;
     }
 
-    let filtered = corretorNome ? properties.filter(p => p.corretor === corretorNome) : properties;
-    document.getElementById('clientTitle').textContent = corretorNome ? `Imóveis de ${corretorNome}` : 'Nossos Imóveis';
+    const urlParams = new URLSearchParams(window.location.search);
+    const userParam = urlParams.get('user');
+    let filtered = userParam ? properties.filter(p => p.corretor === userParam) : properties;
+    document.getElementById('client-title').textContent = userParam ? `Imóveis de ${userParam}` : 'Nossos Imóveis';
 
     if (filtered.length === 0) {
-        grid.innerHTML = '<p class="text-center col-span-full">Nenhum imóvel encontrado.</p>';
+        grid.innerHTML = '<p class="col-span-full text-center">Nenhum imóvel encontrado.</p>';
         return;
     }
 
@@ -279,28 +279,28 @@ async function showClient(corretorNome = null) {
         const fotos = prop.fotos ? JSON.parse(prop.fotos) : [];
         const fotoPrincipal = fotos[0] || 'https://via.placeholder.com/400x300.png?text=Sem+Foto';
         grid.innerHTML += `
-            <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-lg flex flex-col">
-                <img src="${fotoPrincipal}" alt="${prop.nome}" class="w-full h-48 object-cover">
+            <div class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg flex flex-col">
+                <img src="${fotoPrincipal}" alt="${prop.nome}" class="w-full h-56 object-cover">
                 <div class="p-4 flex flex-col flex-grow">
                     <h3 class="text-xl font-bold text-white mb-2">${prop.nome}</h3>
-                    <p class="text-2xl font-semibold text-green-400 mb-2">${prop.preco}</p>
-                    <p class="text-slate-400 text-sm mb-4">${prop.endereco}</p>
-                    <p class="text-slate-300 mb-4 flex-grow text-sm">${prop.descricao}</p>
-                    <div class="border-t border-slate-700 pt-3 mt-auto text-sm">
+                    <p class="text-2xl font-semibold text-blue-400 mb-2">${prop.preco}</p>
+                    <p class="text-gray-400 text-sm mb-4">${prop.endereco}</p>
+                    <p class="text-gray-300 mb-4 flex-grow text-sm">${prop.descricao}</p>
+                    <div class="border-t border-gray-700 pt-3 mt-auto text-sm">
                         <p class="font-semibold text-white">${corretor?.nome || ''}</p>
-                        <p class="text-slate-400">CRECI: ${corretor?.creci || ''}</p>
-                        <p class="text-slate-400">Telefone: ${corretor?.telefone || ''}</p>
+                        <p class="text-gray-400">CRECI: ${corretor?.creci || ''}</p>
+                        <p class="text-gray-400">Telefone: ${corretor?.telefone || ''}</p>
                     </div>
                     <div class="flex gap-2 mt-4">
                         ${prop.site ? `<a href="${prop.site}" target="_blank" class="flex-1 text-center bg-gray-600 hover:bg-gray-700 p-2 rounded-md font-semibold text-sm">Ver Site</a>` : ''}
-                        <a href="https://wa.me/${(corretor?.telefone || '').replace(/\D/g,'')}" target="_blank" class="flex-1 text-center bg-green-600 hover:bg-green-700 p-2 rounded-md font-semibold text-sm">Agendar Visita</a>
+                        <a href="https://wa.me/${(corretor?.telefone || '').replace(/\D/g,'')}" target="_blank" class="flex-1 text-center bg-green-600 hover:bg-green-700 p-2 rounded-md font-semibold text-sm">Chamar no WhatsApp</a>
                     </div>
                 </div>
             </div>`;
     });
 }
 
-// --- EVENT LISTENERS E INICIALIZAÇÃO ---
+// --- INICIALIZAÇÃO DA PÁGINA ---
 document.addEventListener('DOMContentLoaded', () => {
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     const urlParams = new URLSearchParams(window.location.search);
@@ -308,17 +308,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loggedInUser) {
         currentUser = loggedInUser;
-        openPanel();
+        renderPanelView();
     } else if (userParam) {
-        showClient(userParam);
+        showClientView();
     } else {
-        show('auth-container');
+        showView('auth-section');
     }
-
-    document.getElementById('btn-show-client').addEventListener('click', () => showClient());
 });
-
 </script>
 </body>
 </html>
-
